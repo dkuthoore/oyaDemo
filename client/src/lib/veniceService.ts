@@ -12,6 +12,7 @@ export interface QuizQuestion {
 
 export interface GeneratedLesson {
   title: string;
+  summary: string;
   tableOfContents: Record<string, string>;
   content: LessonSection[];
   quiz: QuizQuestion[];

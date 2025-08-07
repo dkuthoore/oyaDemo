@@ -58,9 +58,12 @@ export default function LessonModal() {
     if (currentSectionIndex < totalSections - 1) {
       markSectionComplete();
       setCurrentSectionIndex(prev => prev + 1);
-    } else if (allSectionsCompleted && !showQuiz) {
+    } else if (currentSectionIndex === totalSections - 1 && !showQuiz) {
+      // Mark the final section complete and show quiz if available
       markSectionComplete();
-      setShowQuiz(true);
+      if (isGeneratedLesson && generatedContent?.quiz) {
+        setShowQuiz(true);
+      }
     }
   };
 

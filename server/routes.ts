@@ -33,7 +33,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     };
 
     const conceptName = conceptMap[concept] || concept;
-    return `Teach me about ${conceptName}. Give me a brief, concise overview. Format your response using markdown with clear headings and bullet points where appropriate. Keep your response to 2 paragraphs or less.`;
+    return `Teach me about ${conceptName}. Give me a brief, concise overview.`;
   };
 
   // Lesson generation endpoint
@@ -45,11 +45,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: 'Topic is required' });
       }
 
-      const prompt = `Please generate a thorough, detailed, 10-page lesson on ${topic}. Assume the user is a beginner and start with fundamental, simple concepts, building in complexity as the lesson goes on. Give prominent examples, cite sources, and be professional. The output should be in json and should have a table of contents, content, and quiz section.
+      const prompt = `Please generate a thorough, detailed, 10-page lesson on ${topic}. Assume the user is a beginner and start with fundamental, simple concepts, building in complexity as the lesson goes on. Give prominent examples, cite sources, and be professional. The output should be in json and should have a title, summary, table of contents, content, and quiz section.
 
 Use this JSON structure:
 {
   "title": "Introduction to ${topic}",
+  "summary": "A 2-sentence summary of what this lesson covers and what students will learn.",
   "tableOfContents": {
     "1": "Section 1 title",
     "2": "Section 2 title",
@@ -80,6 +81,10 @@ Use this JSON structure:
         body: JSON.stringify({
           model: 'llama-3.3-70b',
           messages: [
+            {
+              role: 'system',
+              content: 'You are an AI Tutor with the role of teaching users various topics in the Web3, Cryptocurrency, and Blockchain industry. Whatever prompts you receive, remember that you are only an expert in cryptocurrency, and you should not answer questions about unrelated topics. For any given topic, you will create a 10 page lesson on the topic, along with a corresponding quiz to test the user\'s understanding of the topic. All of your responses should be clear, and easy to understand. Also, format your output using markdown formatting syntax, make sure things look professional and well formatted.'
+            },
             {
               role: 'user',
               content: prompt
@@ -126,8 +131,8 @@ Use this JSON structure:
         return res.status(500).json({ error: 'Gemini API not configured' });
       }
 
-      // Use concept prompt if provided, otherwise use the user message with formatting instructions
-      const prompt = concept ? getConceptPrompt(concept) : `${message}\n\nPlease format your response using markdown with clear headings and bullet points where appropriate. Keep your response concise and to 2 paragraphs or less.`;
+      // Use concept prompt if provided, otherwise use the user message (system prompt handles formatting)
+      const prompt = concept ? getConceptPrompt(concept) : message;
       
       // Set up streaming response
       res.setHeader('Content-Type', 'text/plain');
@@ -137,6 +142,14 @@ Use this JSON structure:
       
       const response = await ai.models.generateContentStream({
         model: "gemini-2.5-flash",
+        config: {
+          systemInstruction: {
+            role: "system",
+            parts: [{ 
+              text: "You are an AI Chatbot with the role of teaching users various topics in the Web3, Cryptocurrency, and Blockchain industry. Whatever prompts you receive, remember that you are only an expert in cryptocurrency, and you should not answer questions about unrelated topics. All of your responses should be clear, concise (2 paragraphs or less), and easy to understand. Also, format your output using markdown formatting syntax."
+            }]
+          }
+        },
         contents: prompt,
       });
 

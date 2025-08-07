@@ -88,7 +88,9 @@ export default function LessonCard({ lesson }: LessonCardProps) {
       </div>
       
       <p className="text-text-secondary mb-6 leading-relaxed flex-grow">
-        {lesson.description}
+        {(lesson as any).isGenerated 
+          ? (lesson as any).generatedContent?.summary || lesson.description
+          : lesson.description}
       </p>
       
       <div className="mt-auto">

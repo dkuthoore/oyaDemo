@@ -7,6 +7,7 @@ import { useAppStore } from '@/stores/appStore';
 import { useLocation } from 'wouter';
 import { useToast } from '@/hooks/use-toast';
 import { chatService } from '@/lib/chatService';
+import { veniceService } from '@/lib/veniceService';
 import { ChatMessage } from '@/types';
 import ReactMarkdown from 'react-markdown';
 
@@ -147,19 +148,63 @@ export default function ChatModal() {
     }
   };
 
-  const handleCreateLesson = () => {
-    toast({
-      title: "Creating Lesson",
-      description: `Creating a comprehensive lesson about ${getConceptDisplayName(currentChatConcept)}...`,
-    });
-    closeChat();
-    setTimeout(() => {
-      setLocation('/lessons');
+  const [isCreatingLesson, setIsCreatingLesson] = useState(false);
+
+  const handleCreateLesson = async () => {
+    if (currentChatConcept === 'general' || !currentChatConcept) {
       toast({
-        title: "Lesson Created",
-        description: "Your new lesson is ready in the Lessons section!",
+        title: "No Topic Selected",
+        description: "Please select a specific topic to create a lesson.",
+        variant: "destructive",
       });
-    }, 1500);
+      return;
+    }
+
+    setIsCreatingLesson(true);
+    
+    try {
+      // Get the concept name for the topic
+      const conceptDisplayName = getConceptDisplayName(currentChatConcept).replace('Topic: ', '');
+      
+      toast({
+        title: "Creating Lesson",
+        description: `Generating a comprehensive lesson about ${conceptDisplayName}...`,
+      });
+
+      const generatedLesson = await veniceService.generateLesson({
+        topic: conceptDisplayName
+      });
+
+      toast({
+        title: "Lesson Generated!",
+        description: `Your ${conceptDisplayName} lesson is ready!`,
+      });
+
+      closeChat();
+      setTimeout(() => {
+        setLocation('/lessons');
+        // Store the lesson in localStorage for now (we can implement proper storage later)
+        const existingLessons = JSON.parse(localStorage.getItem('generatedLessons') || '[]');
+        const lessonWithId = {
+          ...generatedLesson,
+          id: Date.now().toString(),
+          createdAt: new Date().toISOString(),
+          topic: currentChatConcept
+        };
+        existingLessons.push(lessonWithId);
+        localStorage.setItem('generatedLessons', JSON.stringify(existingLessons));
+      }, 1500);
+
+    } catch (error) {
+      console.error('Failed to create lesson:', error);
+      toast({
+        title: "Failed to Create Lesson",
+        description: "There was an error generating your lesson. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsCreatingLesson(false);
+    }
   };
 
   const getConceptDisplayName = (conceptId: string) => {
@@ -211,12 +256,17 @@ export default function ChatModal() {
           </div>
           <Button
             onClick={handleCreateLesson}
+            disabled={isCreatingLesson}
             variant="outline"
-            className="flex items-center space-x-2 bg-white/10 hover:bg-white/20 border-white/20"
+            className="flex items-center space-x-2 bg-white/10 hover:bg-white/20 border-white/20 disabled:opacity-50"
             data-testid="button-create-lesson"
           >
-            <BookOpen className="w-4 h-4" />
-            <span>Create Lesson</span>
+            {isCreatingLesson ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <BookOpen className="w-4 h-4" />
+            )}
+            <span>{isCreatingLesson ? 'Creating...' : 'Create Lesson'}</span>
           </Button>
         </div>
 

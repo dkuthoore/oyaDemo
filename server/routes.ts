@@ -36,6 +36,87 @@ export async function registerRoutes(app: Express): Promise<Server> {
     return `Teach me about ${conceptName}. Give me a brief, concise overview. Format your response using markdown with clear headings and bullet points where appropriate. Keep your response to 2 paragraphs or less.`;
   };
 
+  // Lesson generation endpoint
+  app.post('/api/generate-lesson', async (req: Request, res: Response) => {
+    try {
+      const { topic } = req.body;
+
+      if (!topic) {
+        return res.status(400).json({ error: 'Topic is required' });
+      }
+
+      const prompt = `Please generate a thorough, detailed, 10-page lesson on ${topic}. Assume the user is a beginner and start with fundamental, simple concepts, building in complexity as the lesson goes on. Give prominent examples, cite sources, and be professional. The output should be in json and should have a table of contents, content, and quiz section.
+
+Use this JSON structure:
+{
+  "title": "Introduction to ${topic}",
+  "tableOfContents": {
+    "1": "Section 1 title",
+    "2": "Section 2 title",
+    "3": "Section 3 title"
+  },
+  "content": [
+    {
+      "sectionNumber": 1,
+      "title": "Section title",
+      "body": "Detailed content here..."
+    }
+  ],
+  "quiz": [
+    {
+      "question": "Question text?",
+      "options": ["Option 1", "Option 2", "Option 3"],
+      "answer": "Correct option"
+    }
+  ]
+}`;
+
+      const veniceResponse = await fetch('https://api.venice.ai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${process.env.VENICE_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'venice-reasoning',
+          messages: [
+            {
+              role: 'user',
+              content: prompt
+            }
+          ],
+          temperature: 0.7,
+          max_tokens: 8000
+        })
+      });
+
+      if (!veniceResponse.ok) {
+        console.error('Venice API error:', await veniceResponse.text());
+        return res.status(500).json({ error: 'Failed to generate lesson' });
+      }
+
+      const veniceData = await veniceResponse.json();
+      const content = veniceData.choices[0].message.content;
+
+      // Try to parse JSON from the response
+      let lessonData;
+      try {
+        // Extract JSON from the response (it might be wrapped in markdown)
+        const jsonMatch = content.match(/```json\n?(.*?)\n?```/) || content.match(/\{[\s\S]*\}/);
+        const jsonString = jsonMatch ? (jsonMatch[1] || jsonMatch[0]) : content;
+        lessonData = JSON.parse(jsonString);
+      } catch (parseError) {
+        console.error('Failed to parse lesson JSON:', parseError);
+        return res.status(500).json({ error: 'Failed to parse lesson content' });
+      }
+
+      res.json({ lesson: lessonData });
+    } catch (error) {
+      console.error('Lesson generation error:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
   // Chat endpoint with streaming
   app.post('/api/chat', async (req: Request, res: Response) => {
     try {

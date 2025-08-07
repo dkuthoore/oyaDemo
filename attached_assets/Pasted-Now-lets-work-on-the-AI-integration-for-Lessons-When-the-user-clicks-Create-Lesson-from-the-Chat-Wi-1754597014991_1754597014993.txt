@@ -1,0 +1,45 @@
+Now lets work on the AI integration for Lessons 
+When the user clicks Create Lesson from the Chat Window, we want to use the current Topic of the Chat to generate the lesson around. In the below example, the topic is Stablecoins. 
+If the user clicks “Create Lesson” from the Chat window, For example, if the user is discussing “Stablecoins” in the chat, and then they click Create Lesson, we should send the following prompt to the Venice API
+“Please generate a thorough, detailed, 10-page lesson on Stablecoins. Assume the user is a beginner and start with fundamental, simple concepts, building in complexity as the lesson goes on. Give prominent examples, cite sources, and be professional. The output should be in json and should have a table of contents, content, and quiz section”
+You can use something like this as an example of the json structure. Which will help you parse the response and insert the response into the UI correctly: 
+{
+  "title": "Introduction to Computer Science",
+  "tableOfContents": {
+    "1": "What is a computer?",
+    "2": "Basic Hardware Components",
+    "3": "Software vs. Hardware"
+  },
+  "content": [
+    {
+      "sectionNumber": 1,
+      "title": "What is a computer?",
+      "body": "A computer is an electronic device that manipulates information, or data. It has the ability to store, retrieve, and process data. You may already know that you can use a computer to type documents, send email, play games, and browse the web."
+    },
+    {
+      "sectionNumber": 2,
+      "title": "Basic Hardware Components",
+      "body": "Hardware is any part of your computer that has a physical structure, such as the keyboard or mouse. It also includes the computer's internal parts, like the hard drive, motherboard, and RAM."
+    },
+    {
+      "sectionNumber": 3,
+      "title": "Software vs. Hardware",
+      "body": "Software is any set of instructions that tells the hardware what to do. Examples of software include web browsers, games, and word processors. The relationship between hardware and software is fundamental to how a computer works."
+    }
+  ],
+  "quiz": [
+    {
+      "question": "Which of these is an example of computer hardware?",
+      "options": ["Web browser", "Motherboard", "Operating system"],
+      "answer": "Motherboard"
+    },
+    {
+      "question": "What is the main function of a computer?",
+      "options": ["To create music", "To manipulate information", "To browse the internet"],
+      "answer": "To manipulate information"
+    }
+  ]
+}
+ 
+Lets use the “Venice Reasoning” model, you can find the Venice API docs here: https://docs.venice.ai/overview/getting-started
+Please prompt me to enter my Venice API key, and i will 

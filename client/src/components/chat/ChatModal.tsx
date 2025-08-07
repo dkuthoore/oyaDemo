@@ -181,6 +181,10 @@ export default function ChatModal() {
       });
 
       closeChat();
+      // Close insights modal if it's open
+      const { closeInsightModal } = useAppStore.getState();
+      closeInsightModal();
+      
       setTimeout(() => {
         setLocation('/lessons');
         // Store the lesson in localStorage for now (we can implement proper storage later)

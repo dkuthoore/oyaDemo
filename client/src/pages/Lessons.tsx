@@ -8,7 +8,27 @@ export default function Lessons() {
     queryKey: ['lessons'],
     queryFn: async () => {
       await new Promise(resolve => setTimeout(resolve, 500));
-      return mockLessons;
+      
+      // Load generated lessons from localStorage
+      const generatedLessons = JSON.parse(localStorage.getItem('generatedLessons') || '[]');
+      
+      // Convert generated lessons to lesson card format
+      const convertedLessons = generatedLessons.map((generatedLesson: any) => ({
+        id: generatedLesson.id,
+        title: generatedLesson.title,
+        description: `AI-generated lesson covering ${Object.keys(generatedLesson.tableOfContents).length} comprehensive sections`,
+        level: 'Beginner',
+        duration: `${Object.keys(generatedLesson.tableOfContents).length * 2} min read`,
+        status: 'Available',
+        progress: 0,
+        tags: ['AI Generated', 'Interactive'],
+        icon: 'Code',
+        isGenerated: true,
+        generatedContent: generatedLesson
+      }));
+      
+      // Combine mock lessons with generated lessons
+      return [...convertedLessons, ...mockLessons];
     }
   });
 

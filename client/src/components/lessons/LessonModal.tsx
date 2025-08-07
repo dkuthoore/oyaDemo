@@ -1,25 +1,78 @@
-import { X, CheckCircle, Circle, ChevronLeft, ChevronRight } from 'lucide-react';
+import { X, CheckCircle, Circle, ChevronLeft, ChevronRight, BookOpen, Award } from 'lucide-react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAppStore } from '@/stores/appStore';
+import { useState, useEffect } from 'react';
+import ReactMarkdown from 'react-markdown';
 
 export default function LessonModal() {
   const { isLessonModalOpen, currentLesson, closeLessonModal } = useAppStore();
+  const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
+  const [completedSections, setCompletedSections] = useState<Set<number>>(new Set());
+  const [showQuiz, setShowQuiz] = useState(false);
+  const [selectedAnswers, setSelectedAnswers] = useState<Record<number, string>>({});
+  const [showQuizResults, setShowQuizResults] = useState(false);
 
   if (!currentLesson) return null;
 
-  const getCategoryColor = (level: string) => {
-    const colors: Record<string, string> = {
-      'Beginner': 'bg-gradient-primary',
-      'Intermediate': 'bg-gradient-secondary',
-      'Advanced': 'bg-gradient-copy'
-    };
-    return colors[level] || 'bg-gradient-primary';
+  // Check if this is a generated lesson
+  const isGeneratedLesson = (currentLesson as any).isGenerated;
+  const generatedContent = isGeneratedLesson ? (currentLesson as any).generatedContent : null;
+  
+  // Get sections based on lesson type
+  const sections = isGeneratedLesson && generatedContent 
+    ? generatedContent.content 
+    : currentLesson.sections;
+    
+  const currentSection = showQuiz 
+    ? { title: 'Quiz', body: '' }
+    : sections[currentSectionIndex];
+
+  const totalSections = sections.length;
+  const allSectionsCompleted = completedSections.size === totalSections;
+
+  useEffect(() => {
+    if (isLessonModalOpen) {
+      setCurrentSectionIndex(0);
+      setCompletedSections(new Set());
+      setShowQuiz(false);
+      setSelectedAnswers({});
+      setShowQuizResults(false);
+    }
+  }, [isLessonModalOpen]);
+
+  const markSectionComplete = () => {
+    setCompletedSections(prev => new Set(prev).add(currentSectionIndex));
   };
 
-  const getIconComponent = (iconName: string) => {
-    return <div className="w-6 h-6 bg-white rounded" />;
+  const navigateToSection = (index: number) => {
+    if (index >= 0 && index < totalSections) {
+      setCurrentSectionIndex(index);
+      setShowQuiz(false);
+    }
+  };
+
+  const handleNext = () => {
+    if (currentSectionIndex < totalSections - 1) {
+      markSectionComplete();
+      setCurrentSectionIndex(prev => prev + 1);
+    } else if (allSectionsCompleted && !showQuiz) {
+      markSectionComplete();
+      setShowQuiz(true);
+    }
+  };
+
+  const handlePrevious = () => {
+    if (showQuiz) {
+      setShowQuiz(false);
+    } else if (currentSectionIndex > 0) {
+      setCurrentSectionIndex(prev => prev - 1);
+    }
+  };
+
+  const handleQuizSubmit = () => {
+    setShowQuizResults(true);
   };
 
   return (
@@ -39,161 +92,215 @@ export default function LessonModal() {
           </div>
           
           <div className="space-y-2">
-            {currentLesson.sections.map((section, index) => (
+            {sections.map((section: any, index: number) => (
               <div
-                key={section.id}
+                key={section.id || section.sectionNumber}
                 className={`p-3 rounded-lg cursor-pointer transition-colors ${
-                  index === 0 ? 'bg-gradient-primary/20' : 'hover:bg-white/5'
+                  index === currentSectionIndex && !showQuiz ? 'bg-gradient-primary/20' : 'hover:bg-white/5'
                 }`}
-                data-testid={`section-${section.id}`}
+                onClick={() => navigateToSection(index)}
+                data-testid={`section-${section.id || section.sectionNumber}`}
               >
                 <div className="flex items-center space-x-3">
-                  {section.completed ? (
+                  {completedSections.has(index) ? (
                     <CheckCircle className="w-4 h-4 text-accent-success" />
                   ) : (
                     <Circle className="w-4 h-4 text-text-secondary" />
                   )}
                   <span className="text-sm font-medium">{section.title}</span>
                 </div>
-                <div className="text-xs text-text-secondary mt-1 ml-7">{section.duration}</div>
+                <div className="text-xs text-text-secondary mt-1 ml-7">
+                  {section.duration || `Section ${section.sectionNumber || index + 1}`}
+                </div>
               </div>
             ))}
+            
+            {/* Quiz Section */}
+            {isGeneratedLesson && generatedContent?.quiz && (
+              <div
+                className={`p-3 rounded-lg cursor-pointer transition-colors ${
+                  showQuiz ? 'bg-gradient-primary/20' : allSectionsCompleted ? 'hover:bg-white/5' : 'opacity-50 cursor-not-allowed'
+                }`}
+                onClick={() => allSectionsCompleted && setShowQuiz(true)}
+                data-testid="quiz-section"
+              >
+                <div className="flex items-center space-x-3">
+                  {showQuizResults ? (
+                    <Award className="w-4 h-4 text-accent-success" />
+                  ) : (
+                    <BookOpen className="w-4 h-4 text-text-secondary" />
+                  )}
+                  <span className="text-sm font-medium">Quiz</span>
+                </div>
+                <div className="text-xs text-text-secondary mt-1 ml-7">
+                  {allSectionsCompleted ? 'Test your knowledge' : 'Complete all sections to unlock'}
+                </div>
+              </div>
+            )}
           </div>
           
           {/* Progress */}
           <div className="mt-8 p-4 glassmorphism rounded-lg">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm">Overall Progress</span>
-              <span className="text-sm text-accent-success">{currentLesson.progress}%</span>
+              <span className="text-sm text-accent-success">
+                {Math.round((completedSections.size / totalSections) * 100)}%
+              </span>
             </div>
             <div className="w-full bg-white/10 rounded-full h-2">
               <div 
-                className="bg-gradient-primary h-2 rounded-full" 
-                style={{ width: `${currentLesson.progress}%` }}
+                className="bg-gradient-primary h-2 rounded-full transition-all duration-300" 
+                style={{ width: `${Math.round((completedSections.size / totalSections) * 100)}%` }}
               />
+            </div>
+            <div className="text-xs text-text-secondary mt-2">
+              {completedSections.size} of {totalSections} sections completed
             </div>
           </div>
         </div>
         
         {/* Main Content */}
         <div className="flex-1 flex flex-col">
-          <ScrollArea className="flex-1 p-8">
-            <div className="mb-8">
-              <div className="flex items-center space-x-3 mb-4">
-                <div className={`w-12 h-12 ${getCategoryColor(currentLesson.level)} rounded-xl flex items-center justify-center`}>
-                  {getIconComponent(currentLesson.icon)}
-                </div>
-                <div>
-                  <h2 className="text-2xl font-bold" data-testid="text-lesson-title">
-                    Introduction to Blockchain
-                  </h2>
-                  <p className="text-text-secondary">
-                    8 minutes • {currentLesson.level}
-                  </p>
-                </div>
+          {/* Header */}
+          <div className="p-6 border-b border-glassmorphism-border">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-2xl font-bold mb-2">
+                  {showQuiz ? 'Quiz Time!' : currentSection?.title}
+                </h2>
+                <p className="text-text-secondary">
+                  {showQuiz 
+                    ? `Test your knowledge with ${generatedContent?.quiz?.length} questions`
+                    : `Section ${currentSectionIndex + 1} of ${totalSections}`}
+                </p>
               </div>
-              
-              {/* Video Placeholder */}
-              <div className="bg-gradient-to-br from-purple-900/50 to-orange-900/50 rounded-xl h-64 flex items-center justify-center mb-6">
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <div className="w-6 h-6 bg-white rounded-full" />
-                  </div>
-                  <p className="text-text-secondary">Video Player Component</p>
-                </div>
-              </div>
-            </div>
-            
-            {/* Content Sections */}
-            <div className="space-y-8">
-              <section>
-                <h3 className="text-xl font-semibold mb-4">What is Blockchain?</h3>
-                <div className="prose prose-invert max-w-none text-text-secondary leading-relaxed">
-                  <p className="mb-4">
-                    A blockchain is a distributed ledger technology that maintains a continuously growing list of records, called blocks, 
-                    which are linked and secured using cryptography. Each block contains a cryptographic hash of the previous block, 
-                    a timestamp, and transaction data.
-                  </p>
-                  <p className="mb-4">
-                    The key innovation of blockchain technology is its decentralized nature, which eliminates the need for a central authority 
-                    or intermediary to validate transactions.
-                  </p>
-                </div>
-              </section>
-              
-              <section>
-                <h3 className="text-xl font-semibold mb-4">Key Properties</h3>
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div className="glassmorphism rounded-lg p-4">
-                    <h4 className="font-medium text-accent-success mb-2">Immutability</h4>
-                    <p className="text-sm text-text-secondary">Once data is recorded, it becomes extremely difficult to alter or delete.</p>
-                  </div>
-                  <div className="glassmorphism rounded-lg p-4">
-                    <h4 className="font-medium text-yellow-400 mb-2">Transparency</h4>
-                    <p className="text-sm text-text-secondary">All transactions are visible to network participants.</p>
-                  </div>
-                  <div className="glassmorphism rounded-lg p-4">
-                    <h4 className="font-medium text-purple-400 mb-2">Decentralization</h4>
-                    <p className="text-sm text-text-secondary">No single point of control or failure.</p>
-                  </div>
-                  <div className="glassmorphism rounded-lg p-4">
-                    <h4 className="font-medium text-accent-card-red mb-2">Security</h4>
-                    <p className="text-sm text-text-secondary">Cryptographic hashing ensures data integrity.</p>
-                  </div>
-                </div>
-              </section>
-              
-              <section>
-                <h3 className="text-xl font-semibold mb-4">Interactive Quiz</h3>
-                <div className="glassmorphism rounded-lg p-6">
-                  <p className="mb-4">What is the primary benefit of blockchain's decentralized nature?</p>
-                  <div className="space-y-2">
-                    <label className="flex items-center space-x-3 cursor-pointer p-2 rounded hover:bg-white/5">
-                      <input type="radio" name="quiz1" value="a" className="text-purple-500" />
-                      <span>Faster transaction processing</span>
-                    </label>
-                    <label className="flex items-center space-x-3 cursor-pointer p-2 rounded hover:bg-white/5">
-                      <input type="radio" name="quiz1" value="b" className="text-purple-500" />
-                      <span>Eliminates need for central authority</span>
-                    </label>
-                    <label className="flex items-center space-x-3 cursor-pointer p-2 rounded hover:bg-white/5">
-                      <input type="radio" name="quiz1" value="c" className="text-purple-500" />
-                      <span>Reduces energy consumption</span>
-                    </label>
-                  </div>
-                  <Button className="mt-4 px-6 py-2 bg-gradient-primary text-white rounded-lg hover:scale-105 transition-all duration-300">
-                    Submit Answer
-                  </Button>
-                </div>
-              </section>
-            </div>
-          </ScrollArea>
-          
-          {/* Navigation */}
-          <div className="flex items-center justify-between p-6 border-t border-glassmorphism-border">
-            <Button
-              variant="ghost"
-              className="px-6 py-3 glassmorphism text-text-secondary rounded-lg hover:scale-105 transition-all duration-300"
-              disabled
-              data-testid="button-previous-section"
-            >
-              <ChevronLeft className="w-4 h-4 mr-2" />
-              Previous
-            </Button>
-            <div className="text-center">
-              <div className="text-sm text-text-secondary mb-1">Section 1 of {currentLesson.sections.length}</div>
-              <div className="w-32 h-1 bg-white/10 rounded-full mx-auto">
-                <div className="w-8 h-1 bg-gradient-primary rounded-full"></div>
+              <div className="flex space-x-2">
+                <Button
+                  onClick={handlePrevious}
+                  variant="outline"
+                  disabled={currentSectionIndex === 0 && !showQuiz}
+                  className="flex items-center space-x-2"
+                  data-testid="button-previous-section"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                  <span>Previous</span>
+                </Button>
+                <Button
+                  onClick={handleNext}
+                  disabled={showQuiz && !allSectionsCompleted}
+                  className="flex items-center space-x-2"
+                  data-testid="button-next-section"
+                >
+                  <span>
+                    {showQuiz 
+                      ? 'Finish' 
+                      : currentSectionIndex === totalSections - 1 
+                        ? 'Complete & Quiz' 
+                        : 'Next'}
+                  </span>
+                  <ChevronRight className="w-4 h-4" />
+                </Button>
               </div>
             </div>
-            <Button
-              className="px-6 py-3 bg-gradient-primary text-white rounded-lg hover:scale-105 transition-all duration-300"
-              data-testid="button-next-section"
-            >
-              Next
-              <ChevronRight className="w-4 h-4 ml-2" />
-            </Button>
           </div>
+
+          {/* Content Area */}
+          <ScrollArea className="flex-1 p-6">
+            {showQuiz ? (
+              <div className="space-y-6">
+                {!showQuizResults ? (
+                  <>
+                    <div className="glassmorphism rounded-lg p-6">
+                      <h3 className="text-lg font-semibold mb-4">Quiz Instructions</h3>
+                      <p className="text-text-secondary mb-4">
+                        Answer all questions to test your understanding of the lesson material.
+                        Select the best answer for each question.
+                      </p>
+                    </div>
+                    
+                    {generatedContent?.quiz?.map((question: any, questionIndex: number) => (
+                      <div key={questionIndex} className="glassmorphism rounded-lg p-6">
+                        <h4 className="font-medium mb-4">
+                          Question {questionIndex + 1}: {question.question}
+                        </h4>
+                        <div className="space-y-2">
+                          {question.options.map((option: string, optionIndex: number) => (
+                            <label
+                              key={optionIndex}
+                              className="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/5 cursor-pointer transition-colors"
+                            >
+                              <input
+                                type="radio"
+                                name={`question-${questionIndex}`}
+                                value={option}
+                                checked={selectedAnswers[questionIndex] === option}
+                                onChange={(e) => setSelectedAnswers(prev => ({
+                                  ...prev,
+                                  [questionIndex]: e.target.value
+                                }))}
+                                className="text-primary"
+                              />
+                              <span className="text-sm">{option}</span>
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                    
+                    <div className="flex justify-center">
+                      <Button
+                        onClick={handleQuizSubmit}
+                        disabled={Object.keys(selectedAnswers).length !== generatedContent?.quiz?.length}
+                        className="px-8 py-3"
+                        data-testid="button-submit-quiz"
+                      >
+                        Submit Quiz
+                      </Button>
+                    </div>
+                  </>
+                ) : (
+                  <div className="text-center space-y-6">
+                    <div className="glassmorphism rounded-lg p-8">
+                      <Award className="w-16 h-16 mx-auto mb-4 text-accent-success" />
+                      <h3 className="text-2xl font-bold mb-2">Quiz Complete!</h3>
+                      <p className="text-text-secondary mb-6">
+                        Great job completing this lesson. You've mastered the fundamentals!
+                      </p>
+                      <div className="space-y-2">
+                        {generatedContent?.quiz?.map((question: any, questionIndex: number) => {
+                          const isCorrect = selectedAnswers[questionIndex] === question.answer;
+                          return (
+                            <div
+                              key={questionIndex}
+                              className={`p-3 rounded-lg text-sm ${
+                                isCorrect ? 'bg-accent-success/20 text-accent-success' : 'bg-red-500/20 text-red-400'
+                              }`}
+                            >
+                              Question {questionIndex + 1}: {isCorrect ? 'Correct' : 'Incorrect'}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="prose prose-invert max-w-none">
+                {isGeneratedLesson ? (
+                  <ReactMarkdown>
+                    {currentSection?.body || 'No content available'}
+                  </ReactMarkdown>
+                ) : (
+                  <div>
+                    <p className="text-text-secondary leading-relaxed">
+                      {currentSection?.content || 'No content available'}
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+          </ScrollArea>
         </div>
       </DialogContent>
     </Dialog>

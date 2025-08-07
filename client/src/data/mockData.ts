@@ -87,7 +87,7 @@ export const mockInsights: Insight[] = [
       {
         text: "gas limit",
         conceptId: "gas-limit",
-        position: { start: 60, end: 69 },
+        position: { start: 58, end: 67 },
         type: "simple",
       },
     ],

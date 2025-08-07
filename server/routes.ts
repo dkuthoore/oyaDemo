@@ -71,14 +71,14 @@ Use this JSON structure:
   ]
 }`;
 
-      const veniceResponse = await fetch('https://api.venice.ai/v1/chat/completions', {
+      const veniceResponse = await fetch('https://api.venice.ai/api/v1/chat/completions', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${process.env.VENICE_API_KEY}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'venice-reasoning',
+          model: 'llama-3.3-70b',
           messages: [
             {
               role: 'user',

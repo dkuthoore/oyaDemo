@@ -63,7 +63,7 @@ export default function LessonCard({ lesson }: LessonCardProps) {
 
   return (
     <div
-      className="glassmorphism rounded-2xl p-8 hover:shadow-purple-glow transition-all duration-300 cursor-pointer group"
+      className="glassmorphism rounded-2xl p-8 hover:shadow-purple-glow transition-all duration-300 cursor-pointer group h-full min-h-[320px] flex flex-col"
       onClick={() => lesson.status !== 'Locked' && openLessonModal(lesson)}
       data-testid={`lesson-card-${lesson.id}`}
     >
@@ -87,43 +87,45 @@ export default function LessonCard({ lesson }: LessonCardProps) {
         </div>
       </div>
       
-      <p className="text-text-secondary mb-6 leading-relaxed">
+      <p className="text-text-secondary mb-6 leading-relaxed flex-grow">
         {lesson.description}
       </p>
       
-      <div className="flex items-center justify-between">
-        <div className="flex space-x-2">
-          {lesson.tags.map((tag) => (
-            <span
-              key={tag}
-              className="px-2 py-1 bg-white/10 rounded-md text-xs"
-            >
-              {tag}
-            </span>
-          ))}
-        </div>
-        <div className={lesson.status === 'Completed' ? 'text-accent-success' : 
-                        lesson.status === 'In Progress' ? 'text-yellow-400' : 
-                        lesson.status === 'Locked' ? 'text-text-secondary' : 'text-accent-card-red'}>
-          {getStatusIcon(lesson.status)}
+      <div className="mt-auto">
+        <div className="flex items-center justify-between">
+          <div className="flex flex-wrap gap-2">
+            {lesson.tags.map((tag) => (
+              <span
+                key={tag}
+                className="px-2 py-1 bg-white/10 rounded-md text-xs"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+          <div className={lesson.status === 'Completed' ? 'text-accent-success' : 
+                          lesson.status === 'In Progress' ? 'text-yellow-400' : 
+                          lesson.status === 'Locked' ? 'text-text-secondary' : 'text-accent-card-red'}>
+            {getStatusIcon(lesson.status)}
+          </div>
         </div>
       </div>
       
-      {/* Progress bar for in-progress lessons */}
-      {lesson.status === 'In Progress' && (
-        <div className="mt-4">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs text-text-secondary">Progress</span>
-            <span className="text-xs text-yellow-400">{lesson.progress}%</span>
+        {/* Progress bar for in-progress lessons */}
+        {lesson.status === 'In Progress' && (
+          <div className="mt-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs text-text-secondary">Progress</span>
+              <span className="text-xs text-yellow-400">{lesson.progress}%</span>
+            </div>
+            <div className="w-full bg-white/10 rounded-full h-2">
+              <div 
+                className="bg-gradient-secondary h-2 rounded-full transition-all duration-300" 
+                style={{ width: `${lesson.progress}%` }}
+              />
+            </div>
           </div>
-          <div className="w-full bg-white/10 rounded-full h-2">
-            <div 
-              className="bg-gradient-secondary h-2 rounded-full transition-all duration-300" 
-              style={{ width: `${lesson.progress}%` }}
-            />
-          </div>
-        </div>
-      )}
+        )}
     </div>
   );
 }

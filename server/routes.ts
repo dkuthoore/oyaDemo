@@ -47,7 +47,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Topic is required" });
       }
 
-      const prompt = `Please generate a thorough, detailed, 10-page lesson on ${topic}. Assume the user is a beginner and start with fundamental, simple concepts, building in complexity as the lesson goes on. Give prominent examples, cite sources, and be professional. The output should be in json and should have a title, summary, table of contents, content, and quiz section.
+      const prompt = `Please generate a thorough, detailed, 10-page lesson on ${topic}. Assume the user is a beginner and start with fundamental, simple concepts and context, building in complexity as the lesson goes on. Give prominent examples, cite sources, and be professional. The output should be in json and should have a title, summary, table of contents, content, and quiz section. There should be 5 questions in the quiz section.
 
 Use this JSON structure:
 {
@@ -83,7 +83,7 @@ Use this JSON structure:
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            model: "qwen-2.5-qwq-32b",
+            model: "llama-3.3-70b",
             messages: [
               {
                 role: "system",
@@ -120,6 +120,7 @@ Use this JSON structure:
         lessonData = JSON.parse(jsonString);
       } catch (parseError) {
         console.error("Failed to parse lesson JSON:", parseError);
+        console.error("Raw content received:", content);
         return res
           .status(500)
           .json({ error: "Failed to parse lesson content" });

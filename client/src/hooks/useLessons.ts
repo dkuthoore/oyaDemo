@@ -7,9 +7,16 @@ export function useLessons() {
     queryKey: ['/api/lessons'],
     queryFn: (): Promise<Lesson[]> => {
       return new Promise((resolve) => {
-        setTimeout(() => resolve(mockLessons), 300);
+        // Get generated lessons from localStorage
+        const generatedLessonsJson = localStorage.getItem('generatedLessons') || '[]';
+        const generatedLessons: Lesson[] = JSON.parse(generatedLessonsJson);
+        
+        // Merge mock lessons with generated lessons, with generated lessons first
+        const allLessons = [...generatedLessons, ...mockLessons];
+        
+        setTimeout(() => resolve(allLessons), 300);
       });
     },
-    staleTime: 1000 * 60 * 10, // 10 minutes
+    staleTime: 1000 * 60 * 5, // 5 minutes - shorter to pick up new lessons faster
   });
 }

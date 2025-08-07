@@ -218,6 +218,11 @@ export default function ChatModal() {
         existingLessons.push(lessonWithId);
         localStorage.setItem('generatedLessons', JSON.stringify(existingLessons));
         
+        // Invalidate lessons cache to refresh the lessons page
+        import('@/lib/queryClient').then(({ queryClient }) => {
+          queryClient.invalidateQueries({ queryKey: ['/api/lessons'] });
+        });
+        
         // Open the lesson modal with the newly generated lesson
         setTimeout(() => {
           openLessonModal(lessonWithId);

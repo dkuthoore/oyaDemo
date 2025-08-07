@@ -1,38 +1,20 @@
 import { motion } from 'framer-motion';
-import { useQuery } from '@tanstack/react-query';
-import { mockLessons } from '@/data/mockData';
 import LessonCard from '@/components/lessons/LessonCard';
+import { useLessons } from '@/hooks/useLessons';
 
 export default function Lessons() {
-  const { data: lessons = [] } = useQuery({
-    queryKey: ['lessons'],
-    queryFn: async () => {
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      // Load generated lessons from localStorage
-      const generatedLessons = JSON.parse(localStorage.getItem('generatedLessons') || '[]');
-      
-      // Convert generated lessons to lesson card format
-      const convertedLessons = generatedLessons.map((generatedLesson: any) => ({
-        id: generatedLesson.id,
-        title: generatedLesson.title,
-        description: `AI-generated lesson covering ${Object.keys(generatedLesson.tableOfContents).length} comprehensive sections`,
-        level: 'Beginner',
-        duration: `${Object.keys(generatedLesson.tableOfContents).length * 2} min read`,
-        status: 'Available',
-        progress: 0,
-        tags: ['AI Generated', 'Interactive'],
-        icon: 'Code',
-        isGenerated: true,
-        generatedContent: generatedLesson
-      }));
-      
-      // Combine mock lessons with generated lessons
-      return [...convertedLessons, ...mockLessons];
-    }
-  });
+  const { data: lessons = [], isLoading } = useLessons();
 
-
+  if (isLoading) {
+    return (
+      <div className="min-h-screen py-20 px-6 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-text-secondary">Loading lessons...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen py-20 px-6">

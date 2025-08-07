@@ -202,18 +202,17 @@ export default function ChatModal() {
         {/* Messages */}
         <ScrollArea ref={scrollRef} className="flex-1 p-6 overflow-y-auto">
           <div className="space-y-4 min-h-0">
-            {chatMessages.length === 0 && (
-              <div className="flex items-start space-x-3">
-                <div className="w-8 h-8 bg-gradient-secondary rounded-full flex items-center justify-center flex-shrink-0">
-                  <Bot className="text-white text-sm" size={16} />
-                </div>
-                <div className="glassmorphism rounded-lg p-3 max-w-[80%]">
-                  <p className="text-sm">
-                    How can I help you?
-                  </p>
-                </div>
+            {/* Always show greeting message first */}
+            <div className="flex items-start space-x-3">
+              <div className="w-8 h-8 bg-gradient-secondary rounded-full flex items-center justify-center flex-shrink-0">
+                <Bot className="text-white text-sm" size={16} />
               </div>
-            )}
+              <div className="glassmorphism rounded-lg p-3 max-w-[80%]">
+                <p className="text-sm">
+                  How can I help you?
+                </p>
+              </div>
+            </div>
             
             {chatMessages.map((message: ChatMessage) => (
               <div

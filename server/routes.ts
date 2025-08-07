@@ -33,7 +33,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     };
 
     const conceptName = conceptMap[concept] || concept;
-    return `Give me a brief, concise overview of ${conceptName}. Format your response using markdown with clear headings and bullet points where appropriate. Keep your response to 2 paragraphs or less.`;
+    return `Teach me about ${conceptName}. Give me a brief, concise overview. Format your response using markdown with clear headings and bullet points where appropriate. Keep your response to 2 paragraphs or less.`;
   };
 
   // Chat endpoint with streaming

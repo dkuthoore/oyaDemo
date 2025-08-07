@@ -64,10 +64,10 @@ export const useAppStore = create<AppState>()(
       openChatWithConcept: (conceptId: string) => {
         const conceptDisplayName = chatService.getConceptDisplayName(conceptId);
         
-        // Add concept as user message when opening from hyperlink
+        // Add concept as formatted user message when opening from hyperlink
         const conceptMessage: ChatMessage = {
           id: Date.now().toString(),
-          content: conceptDisplayName,
+          content: `Teach me about ${conceptDisplayName}`,
           role: 'user',
           timestamp: new Date()
         };
@@ -75,7 +75,7 @@ export const useAppStore = create<AppState>()(
         set({ 
           isChatOpen: true, 
           currentChatConcept: conceptId,
-          chatMessages: [conceptMessage] // Start with concept message
+          chatMessages: [conceptMessage] // Start with formatted concept message
         });
 
         // Auto-trigger AI response for concept

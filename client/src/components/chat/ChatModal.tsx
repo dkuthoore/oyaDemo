@@ -2,17 +2,25 @@ import { useState, useEffect, useRef } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
-import { Send, X, Bot, User, BookOpen } from 'lucide-react';
+import { Send, X, Bot, User, BookOpen, Loader2 } from 'lucide-react';
 import { useAppStore } from '@/stores/appStore';
-import { useChat } from '@/hooks/useChat';
 import { useLocation } from 'wouter';
 import { useToast } from '@/hooks/use-toast';
+import { chatService } from '@/lib/chatService';
+import { ChatMessage } from '@/types';
 
 export default function ChatModal() {
   const [input, setInput] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
-  const { isChatOpen, currentChatConcept, closeChat } = useAppStore();
-  const { messages, isLoading, sendMessage, suggestedQuestions } = useChat();
+  const { 
+    isChatOpen, 
+    currentChatConcept, 
+    closeChat, 
+    chatMessages, 
+    addChatMessage, 
+    isGeneratingResponse,
+    setGeneratingResponse 
+  } = useAppStore();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
 
@@ -20,17 +28,103 @@ export default function ChatModal() {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [messages]);
+  }, [chatMessages]);
 
-  const handleSend = () => {
-    if (input.trim() && !isLoading) {
-      sendMessage(input);
+  const handleSend = async () => {
+    if (input.trim() && !isGeneratingResponse) {
+      const userMessage: ChatMessage = {
+        id: Date.now().toString(),
+        content: input.trim(),
+        role: 'user',
+        timestamp: new Date()
+      };
+      
+      addChatMessage(userMessage);
       setInput('');
+      setGeneratingResponse(true);
+      
+      try {
+        const stream = await chatService.sendMessage({ message: input.trim() });
+        const reader = stream.getReader();
+        let fullResponse = '';
+        
+        const aiMessage: ChatMessage = {
+          id: (Date.now() + 1).toString(),
+          content: '',
+          role: 'assistant', 
+          timestamp: new Date()
+        };
+        
+        addChatMessage(aiMessage);
+        
+        const readStream = () => {
+          reader.read().then(({ done, value }) => {
+            if (done) {
+              setGeneratingResponse(false);
+              return;
+            }
+            
+            fullResponse += value;
+            readStream();
+          }).catch((error: any) => {
+            console.error('Stream reading error:', error);
+            setGeneratingResponse(false);
+          });
+        };
+        
+        readStream();
+      } catch (error) {
+        console.error('Chat service error:', error);
+        setGeneratingResponse(false);
+      }
     }
   };
 
-  const handleSuggestedQuestion = (question: string) => {
-    sendMessage(question);
+  const handleSuggestedQuestion = async (question: string) => {
+    const userMessage: ChatMessage = {
+      id: Date.now().toString(),
+      content: question,
+      role: 'user',
+      timestamp: new Date()
+    };
+    
+    addChatMessage(userMessage);
+    setGeneratingResponse(true);
+    
+    try {
+      const stream = await chatService.sendMessage({ message: question });
+      const reader = stream.getReader();
+      let fullResponse = '';
+      
+      const aiMessage: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        content: '',
+        role: 'assistant',
+        timestamp: new Date()
+      };
+      
+      addChatMessage(aiMessage);
+      
+      const readStream = () => {
+        reader.read().then(({ done, value }) => {
+          if (done) {
+            setGeneratingResponse(false);
+            return;
+          }
+          
+          fullResponse += value;
+          readStream();
+        }).catch((error: any) => {
+          console.error('Stream reading error:', error);
+          setGeneratingResponse(false);
+        });
+      };
+      
+      readStream();
+    } catch (error) {
+      console.error('Chat service error:', error);
+      setGeneratingResponse(false);
+    }
   };
 
   const handleCreateLesson = () => {
@@ -88,7 +182,7 @@ export default function ChatModal() {
         {/* Messages */}
         <ScrollArea ref={scrollRef} className="flex-1 p-6">
           <div className="space-y-4">
-            {messages.length === 0 && (
+            {chatMessages.length === 0 && (
               <div className="flex items-start space-x-3">
                 <div className="w-8 h-8 bg-gradient-secondary rounded-full flex items-center justify-center flex-shrink-0">
                   <Bot className="text-white text-sm" size={16} />
@@ -101,7 +195,7 @@ export default function ChatModal() {
               </div>
             )}
             
-            {messages.map((message) => (
+            {chatMessages.map((message: ChatMessage) => (
               <div
                 key={message.id}
                 className={`flex items-start space-x-3 ${
@@ -127,7 +221,7 @@ export default function ChatModal() {
               </div>
             ))}
             
-            {isLoading && (
+            {isGeneratingResponse && (
               <div className="flex items-start space-x-3">
                 <div className="w-8 h-8 bg-gradient-secondary rounded-full flex items-center justify-center flex-shrink-0">
                   <Bot className="text-white text-sm" size={16} />
@@ -144,24 +238,7 @@ export default function ChatModal() {
           </div>
         </ScrollArea>
 
-        {/* Suggested Questions */}
-        {suggestedQuestions.length > 0 && messages.length === 0 && (
-          <div className="px-6 py-3 border-t border-glassmorphism-border">
-            <p className="text-xs text-text-secondary mb-2">Suggested questions:</p>
-            <div className="flex flex-wrap gap-2">
-              {suggestedQuestions.map((question, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => handleSuggestedQuestion(question)}
-                  className="text-xs px-3 py-1 rounded-full bg-white/10 text-white/80 hover:bg-white/20 transition-colors"
-                  data-testid={`suggestion-${idx}`}
-                >
-                  {question}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
+
 
         {/* Input Area */}
         <div className="p-6 border-t border-glassmorphism-border">
@@ -173,12 +250,12 @@ export default function ChatModal() {
               onKeyPress={(e) => e.key === 'Enter' && handleSend()}
               placeholder="Ask me about crypto concepts..."
               className="flex-1 bg-white/5 border border-glassmorphism-border rounded-lg px-4 py-3 text-white placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-purple-500"
-              disabled={isLoading}
+              disabled={isGeneratingResponse}
               data-testid="input-chat-message"
             />
             <Button
               onClick={handleSend}
-              disabled={!input.trim() || isLoading}
+              disabled={!input.trim() || isGeneratingResponse}
               className="px-6 py-3 bg-gradient-primary text-white rounded-lg hover:scale-105 transition-all duration-300"
               data-testid="button-send-message"
             >

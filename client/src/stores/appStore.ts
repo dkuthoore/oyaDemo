@@ -1,12 +1,14 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { ChatMessage, Insight, Lesson } from '@/types';
+import { chatService } from '@/lib/chatService';
 
 interface AppState {
   // Chat state
   chatMessages: ChatMessage[];
   currentChatConcept: string;
   isChatOpen: boolean;
+  isGeneratingResponse: boolean;
   
   // Modal state
   isInsightModalOpen: boolean;
@@ -21,6 +23,7 @@ interface AppState {
   closeChat: () => void;
   addChatMessage: (message: ChatMessage) => void;
   clearChatMessages: () => void;
+  setGeneratingResponse: (isGenerating: boolean) => void;
   
   openInsightModal: (insight: Insight) => void;
   closeInsightModal: () => void;
@@ -40,6 +43,7 @@ export const useAppStore = create<AppState>()(
       chatMessages: [],
       currentChatConcept: 'general',
       isChatOpen: false,
+      isGeneratingResponse: false,
       isInsightModalOpen: false,
       currentInsight: null,
       isInsightsModalOpen: false,
@@ -49,11 +53,74 @@ export const useAppStore = create<AppState>()(
       
       // Actions
       openChat: (conceptId: string) => {
+        const conceptDisplayName = chatService.getConceptDisplayName(conceptId);
+        
+        // Add concept as user message when opening from hyperlink
+        const conceptMessage: ChatMessage = {
+          id: Date.now().toString(),
+          content: conceptDisplayName,
+          role: 'user',
+          timestamp: new Date()
+        };
+
         set({ 
           isChatOpen: true, 
           currentChatConcept: conceptId,
-          chatMessages: [] // Clear messages when opening new concept
+          chatMessages: [conceptMessage] // Start with concept message
         });
+
+        // Auto-trigger AI response for concept
+        get().setGeneratingResponse(true);
+        
+        // Stream AI response
+        chatService.sendMessage({ message: '', concept: conceptId })
+          .then((stream: ReadableStream<string>) => {
+            const reader = stream.getReader();
+            let fullResponse = '';
+            
+            const aiMessage: ChatMessage = {
+              id: (Date.now() + 1).toString(),
+              content: '',
+              role: 'assistant',
+              timestamp: new Date()
+            };
+            
+            // Add empty AI message to start streaming
+            set((state) => ({
+              chatMessages: [...state.chatMessages, aiMessage]
+            }));
+            
+            function readStream() {
+              reader.read().then(({ done, value }) => {
+                if (done) {
+                  get().setGeneratingResponse(false);
+                  return;
+                }
+                
+                fullResponse += value;
+                
+                // Update the AI message with accumulated response
+                set((state) => ({
+                  chatMessages: state.chatMessages.map(msg => 
+                    msg.id === aiMessage.id 
+                      ? { ...msg, content: fullResponse }
+                      : msg
+                  )
+                }));
+                
+                readStream();
+              }).catch((error: any) => {
+                console.error('Stream reading error:', error);
+                get().setGeneratingResponse(false);
+              });
+            }
+            
+            readStream();
+          })
+          .catch((error: any) => {
+            console.error('Chat service error:', error);
+            get().setGeneratingResponse(false);
+          });
       },
       
       closeChat: () => {
@@ -68,6 +135,10 @@ export const useAppStore = create<AppState>()(
       
       clearChatMessages: () => {
         set({ chatMessages: [] });
+      },
+
+      setGeneratingResponse: (isGenerating: boolean) => {
+        set({ isGeneratingResponse: isGenerating });
       },
       
       openInsightModal: (insight: Insight) => {

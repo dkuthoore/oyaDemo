@@ -1,0 +1,1699 @@
+Master Product Requirements Document (PRD)
+CryptoLearn AI Platform - Complete Implementation Guide
+Table of Contents
+
+Executive Summary
+Project Setup & Dependencies
+Design System Implementation
+Technical Architecture
+Core Features Specification
+Component Implementation Guide
+API Integration Details
+Step-by-Step Build Order
+Testing & Validation
+Common Pitfalls & Solutions
+
+
+1. Executive Summary
+Project Overview
+
+Name: CryptoLearn AI Platform
+Type: React-based POC/Prototype
+Duration: 4 hours development time
+Purpose: Demonstrate senior React engineering skills for OyaChat
+
+Core Functionality
+
+Insight Cards: Display crypto insights with hyperlinked concepts
+AI Chat: Quick explanations via Venice API (privacy-preserving)
+Deep Lessons: Comprehensive learning via Gemini API
+Modern UI: Glassmorphism design with crypto-focused aesthetics
+
+Key Technologies
+
+React 18+ with TypeScript
+Tanstack Query for API state management
+ShadCN UI components
+Tailwind CSS with custom design system
+Venice AI & Gemini APIs
+Framer Motion for animations
+
+
+2. Project Setup & Dependencies
+2.1 Initialize Project
+bashCopy# Create Vite project with React and TypeScript
+npm create vite@latest cryptolearn-ai -- --template react-ts
+cd cryptolearn-ai
+
+# Install core dependencies
+npm install react-router-dom @tanstack/react-query @tanstack/react-query-devtools
+npm install zustand axios zod
+npm install framer-motion lucide-react
+npm install @radix-ui/react-dialog @radix-ui/react-scroll-area
+npm install class-variance-authority clsx tailwind-merge
+npm install @google/generative-ai
+
+# Dev dependencies
+npm install -D @types/node tailwindcss postcss autoprefixer
+npm install -D @tailwindcss/forms tailwindcss-animate
+2.2 Project Structure
+Copycryptolearn-ai/
+├── public/
+│   └── assets/
+│       └── noise-texture.png
+├── src/
+│   ├── features/
+│   │   ├── insights/
+│   │   │   ├── components/
+│   │   │   │   ├── InsightCard.tsx
+│   │   │   │   ├── InsightModal.tsx
+│   │   │   │   └── InsightList.tsx
+│   │   │   ├── hooks/
+│   │   │   │   └── useInsights.ts
+│   │   │   ├── services/
+│   │   │   │   └── insightService.ts
+│   │   │   └── types/
+│   │   │       └── index.ts
+│   │   ├── chat/
+│   │   │   ├── components/
+│   │   │   │   ├── ChatModal.tsx
+│   │   │   │   ├── ChatMessage.tsx
+│   │   │   │   └── FloatingChatButton.tsx
+│   │   │   ├── hooks/
+│   │   │   │   └── useAIChat.ts
+│   │   │   └── services/
+│   │   │       └── chatService.ts
+│   │   └── lessons/
+│   │       ├── components/
+│   │       │   ├── LessonModal.tsx
+│   │       │   └── LessonList.tsx
+│   │       ├── hooks/
+│   │       │   └── useLessons.ts
+│   │       └── services/
+│   │           └── lessonService.ts
+│   ├── shared/
+│   │   ├── components/
+│   │   │   ├── ui/
+│   │   │   │   ├── button.tsx
+│   │   │   │   ├── dialog.tsx
+│   │   │   │   └── scroll-area.tsx
+│   │   │   └── layout/
+│   │   │       ├── Navigation.tsx
+│   │   │       └── Layout.tsx
+│   │   ├── hooks/
+│   │   │   ├── useTheme.ts
+│   │   │   └── useResponsive.ts
+│   │   ├── styles/
+│   │   │   ├── globals.css
+│   │   │   └── design-tokens.ts
+│   │   └── utils/
+│   │       └── cn.ts
+│   ├── services/
+│   │   ├── api/
+│   │   │   ├── client.ts
+│   │   │   ├── venice.ts
+│   │   │   └── gemini.ts
+│   │   └── storage/
+│   │       └── localStorage.ts
+│   ├── pages/
+│   │   ├── Landing.tsx
+│   │   ├── Dashboard.tsx
+│   │   └── Lessons.tsx
+│   ├── providers/
+│   │   ├── QueryProvider.tsx
+│   │   └── ThemeProvider.tsx
+│   ├── App.tsx
+│   ├── main.tsx
+│   └── vite-env.d.ts
+├── .env.example
+├── tailwind.config.js
+├── tsconfig.json
+└── vite.config.ts
+2.3 Environment Configuration
+bashCopy# .env.example
+VITE_VENICE_API_KEY=your_venice_api_key_here
+VITE_VENICE_API_URL=https://api.venice.ai/v1
+VITE_GEMINI_API_KEY=your_gemini_api_key_here
+2.4 TypeScript Configuration
+jsonCopy// tsconfig.json
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["src"],
+  "references": [{ "path": "./tsconfig.node.json" }]
+}
+
+3. Design System Implementation
+3.1 Tailwind Configuration
+javascriptCopy// tailwind.config.js
+module.exports = {
+  darkMode: 'class',
+  content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
+  theme: {
+    extend: {
+      colors: {
+        background: {
+          DEFAULT: '#111111',
+          glassmorphism: 'rgba(40, 40, 40, 0.6)',
+          'stat-card': 'rgba(39, 39, 42, 0.8)',
+        },
+        text: {
+          primary: '#FFFFFF',
+          secondary: '#A1A1AA',
+        },
+        accent: {
+          'card-red': '#F43F5E',
+        },
+        border: {
+          glassmorphism: 'rgba(255, 255, 255, 0.1)',
+        },
+        icon: '#E5E7EB',
+      },
+      backgroundImage: {
+        'gradient-primary': 'linear-gradient(to right, #F59E0B, #D946EF)',
+        'gradient-secondary': 'linear-gradient(to right, #8B5CF6, #F59E0B)',
+        'gradient-copy': 'linear-gradient(to right, #A855F7, #EC4899)',
+        'noise': "url('/assets/noise-texture.png')",
+      },
+      fontFamily: {
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+      },
+      fontSize: {
+        'hero': 'clamp(3rem, 10vw, 6rem)',
+      },
+      backdropBlur: {
+        xs: '10px',
+      },
+      boxShadow: {
+        'card-glow': '0 0 30px 5px rgba(244, 63, 94, 0.3)',
+      },
+      animation: {
+        'glow-pulse': 'glow-pulse 2s ease-in-out infinite',
+      },
+      keyframes: {
+        'glow-pulse': {
+          '0%, 100%': { boxShadow: '0 0 20px 2px rgba(244, 63, 94, 0.3)' },
+          '50%': { boxShadow: '0 0 40px 10px rgba(244, 63, 94, 0.5)' },
+        },
+      },
+    },
+  },
+  plugins: [
+    require('@tailwindcss/forms'),
+    require('tailwindcss-animate'),
+  ],
+};
+3.2 Global Styles
+cssCopy/* src/shared/styles/globals.css */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background-dark: #111111;
+    --glassmorphism-bg: rgba(40, 40, 40, 0.6);
+    --glassmorphism-border: rgba(255, 255, 255, 0.1);
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-text-primary;
+    font-family: 'Inter', system-ui, sans-serif;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* Background gradient with noise */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+      url('/assets/noise-texture.png'),
+      radial-gradient(ellipse at top left, rgba(245, 158, 11, 0.2), transparent 50%),
+      radial-gradient(ellipse at bottom right, rgba(217, 70, 239, 0.2), transparent 50%),
+      radial-gradient(ellipse at center, rgba(139, 92, 246, 0.1), transparent 70%);
+    z-index: -1;
+    pointer-events: none;
+  }
+}
+
+@layer components {
+  .glassmorphism {
+    @apply bg-background-glassmorphism backdrop-blur-xs border border-border-glassmorphism;
+  }
+
+  .gradient-text {
+    @apply bg-gradient-primary bg-clip-text text-transparent;
+  }
+
+  .insight-hyperlink {
+    @apply underline decoration-dotted underline-offset-2 hover:text-yellow-400 transition-colors cursor-pointer;
+  }
+}
+
+@layer utilities {
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-white/5 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-gradient-primary rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply opacity-80;
+  }
+}
+3.3 Design Tokens
+typescriptCopy// src/shared/styles/design-tokens.ts
+export const designTokens = {
+  colors: {
+    gradients: {
+      primary: 'linear-gradient(to right, #F59E0B, #D946EF)',
+      secondary: 'linear-gradient(to right, #8B5CF6, #F59E0B)',
+      copyButton: 'linear-gradient(to right, #A855F7, #EC4899)',
+    },
+    text: {
+      primary: '#FFFFFF',
+      secondary: '#A1A1AA',
+    },
+    background: {
+      dark: '#111111',
+      glassmorphism: 'rgba(40, 40, 40, 0.6)',
+      statCard: 'rgba(39, 39, 42, 0.8)',
+    },
+    borders: {
+      glassmorphism: 'rgba(255, 255, 255, 0.1)',
+    },
+    accent: {
+      cardRed: '#F43F5E',
+    },
+    icon: '#E5E7EB',
+  },
+  typography: {
+    fontFamily: 'Inter, sans-serif',
+    sizes: {
+      header: 'clamp(3rem, 10vw, 6rem)',
+      subHeader: '1.25rem',
+      body: '1rem',
+      cardTitle: '0.875rem',
+      statNumber: '2.25rem',
+    },
+    weights: {
+      regular: 400,
+      medium: 500,
+      bold: 700,
+    },
+  },
+  spacing: {
+    base: 8,
+    container: 24,
+  },
+  borderRadius: {
+    small: '8px',
+    medium: '16px',
+    large: '24px',
+    full: '9999px',
+  },
+  effects: {
+    glassmorphism: `
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    `,
+    cardGlow: '0 0 30px 5px rgba(244, 63, 94, 0.3)',
+  },
+} as const;
+
+export type DesignTokens = typeof designTokens;
+
+4. Technical Architecture
+4.1 Vite Configuration
+typescriptCopy// vite.config.ts
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import path from 'path';
+
+export default defineConfig({
+  plugins: [react()],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+    },
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          'query-vendor': ['@tanstack/react-query'],
+          'ui-vendor': ['@radix-ui/react-dialog', '@radix-ui/react-scroll-area'],
+          'animation': ['framer-motion'],
+        },
+      },
+    },
+  },
+});
+4.2 Utility Functions
+typescriptCopy// src/shared/utils/cn.ts
+import { type ClassValue, clsx } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
+4.3 Query Client Configuration
+typescriptCopy// src/providers/QueryProvider.tsx
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { ReactNode } from 'react';
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5, // 5 minutes
+      gcTime: 1000 * 60 * 30, // 30 minutes
+      retry: (failureCount, error: any) => {
+        if (error?.response?.status === 429) return true;
+        return failureCount < 2;
+      },
+      refetchOnWindowFocus: false,
+    },
+    mutations: {
+      retry: 1,
+    },
+  },
+});
+
+export const QueryProvider = ({ children }: { children: ReactNode }) => {
+  return (
+    <QueryClientProvider client={queryClient}>
+      {children}
+      <ReactQueryDevtools initialIsOpen={false} />
+    </QueryClientProvider>
+  );
+};
+
+5. Core Features Specification
+5.1 Type Definitions
+typescriptCopy// src/features/insights/types/index.ts
+export interface Insight {
+  id: string;
+  content: string;
+  hyperlinks: ConceptLink[];
+  tags: string[];
+  timestamp: Date;
+  source?: string;
+}
+
+export interface ConceptLink {
+  text: string;
+  conceptId: string;
+  position: { start: number; end: number };
+  type: 'simple' | 'complex';
+}
+
+// src/features/chat/types/index.ts
+export interface ChatMessage {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: Date;
+}
+
+export interface ChatSession {
+  conceptId: string;
+  messages: ChatMessage[];
+  suggestedQuestions: string[];
+}
+
+// src/features/lessons/types/index.ts
+export interface Lesson {
+  id: string;
+  conceptId: string;
+  title: string;
+  sections: LessonSection[];
+  glossary: GlossaryTerm[];
+  sources: Source[];
+  createdAt: Date;
+  userLevel: 'beginner' | 'intermediate' | 'advanced';
+  status: 'generating' | 'ready' | 'error';
+}
+
+export interface LessonSection {
+  title: string;
+  content: string;
+  visualAids?: string[];
+}
+
+export interface GlossaryTerm {
+  term: string;
+  definition: string;
+}
+
+export interface Source {
+  title: string;
+  url: string;
+  credibility: 'high' | 'medium' | 'low';
+}
+5.2 Sample Data
+typescriptCopy// src/shared/data/sampleData.ts
+export const sampleInsights: Insight[] = [
+  {
+    id: '1',
+    content: 'Circle IPO is super hot, up 10x from the IPO price',
+    hyperlinks: [
+      { 
+        text: 'Circle', 
+        conceptId: 'circle-usdc', 
+        position: { start: 0, end: 6 },
+        type: 'complex' 
+      },
+      { 
+        text: 'IPO', 
+        conceptId: 'ipo-basics', 
+        position: { start: 7, end: 10 },
+        type: 'simple' 
+      }
+    ],
+    tags: ['Stablecoins', 'RWA', 'IPO'],
+    timestamp: new Date(),
+    source: 'OyaChat Market Analysis'
+  },
+  {
+    id: '2',
+    content: 'The first version of the Oya protocol testnet was deployed in June 2024, and the public testnet is coming later this year.',
+    hyperlinks: [
+      {
+        text: 'testnet',
+        conceptId: 'testnet-explained',
+        position: { start: 37, end: 44 },
+        type: 'simple'
+      }
+    ],
+    tags: ['Development', 'OyaChat', 'Infrastructure'],
+    timestamp: new Date()
+  },
+  {
+    id: '3',
+    content: 'At about $0.21 per coin, Dogecoin\'s $31 billion market cap in early 2025 was larger than many Fortune 500 companies despite having no supply cap.',
+    hyperlinks: [
+      {
+        text: 'market cap',
+        conceptId: 'market-cap',
+        position: { start: 48, end: 58 },
+        type: 'simple'
+      },
+      {
+        text: 'supply cap',
+        conceptId: 'tokenomics',
+        position: { start: 137, end: 147 },
+        type: 'complex'
+      }
+    ],
+    tags: ['Dogecoin', 'Tokenomics', 'Market Analysis'],
+    timestamp: new Date()
+  }
+];
+
+6. Component Implementation Guide
+6.1 Main App Component
+typescriptCopy// src/App.tsx
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { QueryProvider } from '@/providers/QueryProvider';
+import { ThemeProvider } from '@/providers/ThemeProvider';
+import { Layout } from '@/shared/components/layout/Layout';
+import { Landing } from '@/pages/Landing';
+import { Dashboard } from '@/pages/Dashboard';
+import { Lessons } from '@/pages/Lessons';
+
+function App() {
+  return (
+    <QueryProvider>
+      <ThemeProvider>
+        <Router>
+          <Routes>
+            <Route path="/" element={<Landing />} />
+            <Route element={<Layout />}>
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/lessons" element={<Lessons />} />
+            </Route>
+          </Routes>
+        </Router>
+      </ThemeProvider>
+    </QueryProvider>
+  );
+}
+
+export default App;
+6.2 Layout Component
+typescriptCopy// src/shared/components/layout/Layout.tsx
+import { Outlet } from 'react-router-dom';
+import { Navigation } from './Navigation';
+import { FloatingChatButton } from '@/features/chat/components/FloatingChatButton';
+
+export const Layout = () => {
+  return (
+    <div className="min-h-screen">
+      <Navigation />
+      <main className="pt-20">
+        <Outlet />
+      </main>
+      <FloatingChatButton />
+    </div>
+  );
+};
+6.3 Navigation Component
+typescriptCopy// src/shared/components/layout/Navigation.tsx
+import { Link, useLocation } from 'react-router-dom';
+import { ChevronDown, Brain, BookOpen, User } from 'lucide-react';
+import { cn } from '@/shared/utils/cn';
+
+export const Navigation = () => {
+  const location = useLocation();
+  
+  const navItems = [
+    { path: '/dashboard', icon: Brain, label: 'Insights' },
+    { path: '/lessons', icon: BookOpen, label: 'Lessons' },
+    { path: '/profile', icon: User, label: 'Profile' },
+  ];
+
+  return (
+    <nav className="fixed top-0 left-0 right-0 p-6 flex justify-between items-center z-50 glassmorphism">
+      <Link to="/" className="flex items-center space-x-2 text-white hover:opacity-80 transition-opacity">
+        <span className="font-bold text-lg">OyaChat</span>
+        <ChevronDown className="w-4 h-4" />
+      </Link>
+      
+      <div className="flex space-x-4">
+        {navItems.map(({ path, icon: Icon, label }) => (
+          <Link
+            key={path}
+            to={path}
+            className={cn(
+              "w-10 h-10 rounded-full flex items-center justify-center transition-all",
+              location.pathname === path
+                ? "bg-gradient-primary text-white"
+                : "bg-white/10 text-icon hover:bg-white/20"
+            )}
+            title={label}
+          >
+            <Icon className="w-5 h-5" />
+          </Link>
+        ))}
+      </div>
+    </nav>
+  );
+};
+6.4 Landing Page
+typescriptCopy// src/pages/Landing.tsx
+import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
+import { Button } from '@/shared/components/ui/button';
+
+export const Landing = () => {
+  const navigate = useNavigate();
+
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center p-6">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        className="text-center max-w-4xl mx-auto"
+      >
+        <h1 className="text-hero font-bold gradient-text mb-6">
+          OyaChat
+        </h1>
+        <p className="text-xl text-text-secondary mb-12">
+          Crypto AI that Empowers you to Think
+        </p>
+        <Button
+          onClick={() => navigate('/dashboard')}
+          className="bg-gradient-secondary text-white px-8 py-4 rounded-full text-lg font-medium hover:opacity-90 transition-opacity shadow-2xl"
+        >
+          Let's go!
+        </Button>
+      </motion.div>
+    </div>
+  );
+};
+6.5 Insight Modal Component
+typescriptCopy// src/features/insights/components/InsightModal.tsx
+import { useState } from 'react';
+import { Dialog, DialogContent } from '@/shared/components/ui/dialog';
+import { ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { InsightCard } from './InsightCard';
+import { useInsights } from '../hooks/useInsights';
+import { motion, AnimatePresence } from 'framer-motion';
+
+interface InsightModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export const InsightModal = ({ isOpen, onClose }: InsightModalProps) => {
+  const { insights, isLoading } = useInsights();
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const handleNavigate = (direction: 'prev' | 'next') => {
+    if (direction === 'prev') {
+      setCurrentIndex(prev => (prev - 1 + insights.length) % insights.length);
+    } else {
+      setCurrentIndex(prev => (prev + 1) % insights.length);
+    }
+  };
+
+  if (isLoading) return null;
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-3xl p-0 bg-transparent border-0">
+        <div className="relative">
+          {/* Close button */}
+          <button
+            onClick={onClose}
+            className="absolute -top-12 right-0 text-white/60 hover:text-white transition-colors"
+          >
+            <X className="w-6 h-6" />
+          </button>
+
+          {/* Navigation buttons */}
+          <button
+            onClick={() => handleNavigate('prev')}
+            className="absolute left-4 top-1/2 -translate-y-1/2 z-10 w-12 h-12 rounded-full glassmorphism flex items-center justify-center hover:bg-white/20 transition-colors"
+          >
+            <ChevronLeft className="w-6 h-6 text-white" />
+          </button>
+          
+          <button
+            onClick={() => handleNavigate('next')}
+            className="absolute right-4 top-1/2 -translate-y-1/2 z-10 w-12 h-12 rounded-full glassmorphism flex items-center justify-center hover:bg-white/20 transition-colors"
+          >
+            <ChevronRight className="w-6 h-6 text-white" />
+          </button>
+
+          {/* Insight cards */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentIndex}
+              initial={{ opacity: 0, x: 50 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -50 }}
+              transition={{ duration: 0.3 }}
+            >
+              <InsightCard insight={insights[currentIndex]} />
+            </motion.div>
+          </AnimatePresence>
+
+          {/* Progress indicator */}
+          <div className="flex justify-center space-x-2 mt-6">
+            {insights.map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => setCurrentIndex(idx)}
+                className={cn(
+                  "w-2 h-2 rounded-full transition-all",
+                  idx === currentIndex
+                    ? "w-8 bg-gradient-primary"
+                    : "bg-white/30 hover:bg-white/50"
+                )}
+              />
+            ))}
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+6.6 Insight Card Component
+typescriptCopy// src/features/insights/components/InsightCard.tsx
+import { Star, Pencil, ThumbsUp, ThumbsDown, Send } from 'lucide-react';
+import { useState } from 'react';
+import { motion } from 'framer-motion';
+import { Insight } from '../types';
+import { useChatModal } from '@/features/chat/hooks/useChatModal';
+
+interface InsightCardProps {
+  insight: Insight;
+}
+
+export const InsightCard = ({ insight }: InsightCardProps) => {
+  const [feedback, setFeedback] = useState('');
+  const { openChat } = useChatModal();
+
+  const renderContentWithHyperlinks = () => {
+    let lastIndex = 0;
+    const elements: JSX.Element[] = [];
+
+    insight.hyperlinks.forEach((link, idx) => {
+      // Add text before hyperlink
+      if (link.position.start > lastIndex) {
+        elements.push(
+          <span key={`text-${idx}`}>
+            {insight.content.slice(lastIndex, link.position.start)}
+          </span>
+        );
+      }
+
+      // Add hyperlink
+      elements.push(
+        <button
+          key={`link-${idx}`}
+          onClick={() => openChat(link.conceptId, link.text)}
+          className="insight-hyperlink"
+        >
+          {link.text}
+        </button>
+      );
+
+      lastIndex = link.position.end;
+    });
+
+    // Add remaining text
+    if (lastIndex < insight.content.length) {
+      elements.push(
+        <span key="text-final">
+          {insight.content.slice(lastIndex)}
+        </span>
+      );
+    }
+
+    return elements;
+  };
+
+  return (
+    <motion.div
+      className="relative w-full max-w-2xl mx-auto"
+      initial={{ scale: 0.95 }}
+      animate={{ scale: 1 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+    >
+      <div className="bg-accent-card-red rounded-3xl p-8 shadow-card-glow relative overflow-hidden">
+        {/* Noise texture overlay */}
+        <div className="absolute inset-0 bg-noise opacity-20 pointer-events-none" />
+        
+        {/* Top Actions */}
+        <div className="flex justify-around mb-8 relative z-10">
+          {[
+            { icon: Star, label: 'Read' },
+            { icon: Star, label: 'Rate' },
+            { icon: Pencil, label: 'Write' },
+          ].map((action) => (
+            <button
+              key={action.label}
+              className="flex flex-col items-center space-y-1 text-white/80 hover:text-white transition-colors group"
+            >
+              <action.icon className="w-6 h-6 group-hover:scale-110 transition-transform" />
+              <span className="text-xs">{action.label}</span>
+            </button>
+          ))}
+        </div>
+
+        {/* Insight Content */}
+        <div className="mb-8 relative z-10">
+          <p className="text-2xl text-white font-medium leading-relaxed text-center">
+            {renderContentWithHyperlinks()}
+          </p>
+        </div>
+
+        {/* Tags */}
+        <div className="flex flex-wrap gap-2 mb-6 relative z-10">
+          {insight.tags.map((tag) => (
+            <button
+              key={tag}
+              onClick={() => openChat(tag.toLowerCase().replace(/\s+/g, '-'), tag)}
+              className="px-3 py-1 text-sm rounded-full bg-white/10 text-white/80 hover:bg-white/20 transition-colors"
+            >
+              {tag}
+            </button>
+          ))}
+        </div>
+
+        {/* Source */}
+        <div className="border-t border-white/20 pt-4 mb-6">
+          <p className="text-sm text-white/60">
+            Source: {insight.source || 'OyaChat AI'}
+          </p>
+        </div>
+
+        {/* Feedback Section */}
+        <div className="space-y-4 relative z-10">
+          <div className="flex justify-between">
+            <button className="p-3 rounded-lg hover:bg-white/10 transition-colors group">
+              <ThumbsDown className="w-5 h-5 text-white/80 group-hover:scale-110 transition-transform" />
+            </button>
+            <button className="p-3 rounded-lg hover:bg-white/10 transition-colors group">
+              <ThumbsUp className="w-5 h-5 text-white/80 group-hover:scale-110 transition-transform" />
+            </button>
+          </div>
+
+          <div className="relative">
+            <input
+              type="text"
+              value={feedback}
+              onChange={(e) => setFeedback(e.target.value)}
+              placeholder="How was this insight?"
+              className="w-full bg-white/10 backdrop-blur-sm border border-white/20 rounded-full py-3 px-6 pr-12 text-white placeholder-white/50 focus:outline-none focus:border-white/40 transition-colors"
+            />
+            <button className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full hover:bg-white/10 transition-colors">
+              <Send className="w-4 h-4 text-white/80" />
+            </button>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+6.7 Chat Modal Component
+typescriptCopy// src/features/chat/components/ChatModal.tsx
+import { useState, useRef, useEffect } from 'react';
+import { Dialog, DialogContent } from '@/shared/components/ui/dialog';
+import { ScrollArea } from '@/shared/components/ui/scroll-area';
+import { Send, Sparkles } from 'lucide-react';
+import { useAIChat } from '../hooks/useAIChat';
+import { ChatMessage } from './ChatMessage';
+import { Button } from '@/shared/components/ui/button';
+import { motion, AnimatePresence } from 'framer-motion';
+
+interface ChatModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  conceptId: string;
+  conceptTitle: string;
+}
+
+export const ChatModal = ({ isOpen, onClose, conceptId, conceptTitle }: ChatModalProps) => {
+  const [input, setInput] = useState('');
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const { messages, sendMessage, isLoading, suggestedQuestions } = useAIChat(conceptId);
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages]);
+
+  const handleSend = () => {
+    if (input.trim()) {
+      sendMessage(input);
+      setInput('');
+    }
+  };
+
+  const handleCreateLesson = () => {
+    // Trigger lesson generation
+    console.log('Creating lesson for:', conceptId);
+    // Show notification
+    onClose();
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="glassmorphism border-border-glassmorphism max-w-lg p-0">
+        <div className="flex flex-col h-[600px]">
+          {/* Header */}
+          <div className="p-6 border-b border-white/10">
+            <h3 className="text-lg font-medium text-white">
+              Learning Assistant
+            </h3>
+            <p className="text-sm text-text-secondary">
+              Ask me anything about {conceptTitle}
+            </p>
+          </div>
+
+          {/* Messages */}
+          <ScrollArea ref={scrollRef} className="flex-1 p-6">
+            <div className="space-y-4">
+              <AnimatePresence initial={false}>
+                {messages.map((message) => (
+                  <motion.div
+                    key={message.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                  >
+                    <ChatMessage message={message} />
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+              
+              {isLoading && (
+                <div className="flex justify-center">
+                  <div className="flex space-x-2">
+                    <div className="w-2 h-2 bg-white/60 rounded-full animate-bounce" />
+                    <div className="w-2 h-2 bg-white/60 rounded-full animate-bounce delay-100" />
+                    <div className="w-2 h-2 bg-white/60 rounded-full animate-bounce delay-200" />
+                  </div>
+                </div>
+              )}
+            </div>
+          </ScrollArea>
+
+          {/* Suggested Questions */}
+          {suggestedQuestions.length > 0 && (
+            <div className="px-6 py-3 border-t border-white/10">
+              <p className="text-xs text-text-secondary mb-2">Suggested questions:</p>
+              <div className="flex flex-wrap gap-2">
+                {suggestedQuestions.slice(0, 3).map((question, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => {
+                      setInput(question);
+                      handleSend();
+                    }}
+                    className="text-xs px-3 py-1 rounded-full bg-white/10 text-white/80 hover:bg-white/20 transition-colors"
+                  >
+                    {question}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Input Area */}
+          <div className="p-6 border-t border-white/10 space-y-3">
+            <div className="flex space-x-2">
+              <input
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleSend()}
+                placeholder="Type your question..."
+                className="flex-1 bg-white/5 border border-white/10 rounded-full px-4 py-2 text-white placeholder-white/50 focus:outline-none focus:border-white/30 transition-colors"
+              />
+              <Button
+                onClick={handleSend}
+                disabled={!input.trim() || isLoading}
+                className="rounded-full bg-gradient-primary text-white hover:opacity-90"
+              >
+                <Send className="w-4 h-4" />
+              </Button>
+            </div>
+            
+            {conceptId && (
+              <Button
+                onClick={handleCreateLesson}
+                className="w-full bg-gradient-secondary text-white rounded-full hover:opacity-90"
+              >
+                <Sparkles className="w-4 h-4 mr-2" />
+                Create Deep Lesson
+              </Button>
+            )}
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+6.8 Floating Chat Button
+typescriptCopy// src/features/chat/components/FloatingChatButton.tsx
+import { MessageCircle } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useState } from 'react';
+import { ChatModal } from './ChatModal';
+
+export const FloatingChatButton = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [quickChatOpen, setQuickChatOpen] = useState(false);
+
+  return (
+    <>
+      <motion.button
+        className="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-gradient-primary text-white shadow-lg hover:shadow-xl transition-shadow flex items-center justify-center group"
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        onClick={() => setQuickChatOpen(true)}
+      >
+        <MessageCircle className="w-6 h-6 group-hover:scale-110 transition-transform" />
+      </motion.button>
+
+      <ChatModal
+        isOpen={quickChatOpen}
+        onClose={() => setQuickChatOpen(false)}
+        conceptId="general"
+        conceptTitle="Crypto Concepts"
+      />
+    </>
+  );
+};
+
+7. API Integration Details
+7.1 API Client Base
+typescriptCopy// src/services/api/client.ts
+import axios from 'axios';
+import { z } from 'zod';
+
+export const apiClient = axios.create({
+  timeout: 30000,
+});
+
+// Request interceptor
+apiClient.interceptors.request.use((config) => {
+  // Add auth headers if needed
+  return config;
+});
+
+// Response interceptor with retry logic
+apiClient.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    if (error.response?.status === 429) {
+      // Rate limit handling
+      const retryAfter = error.response.headers['retry-after'] || 1;
+      await new Promise(resolve => setTimeout(resolve, retryAfter * 1000));
+      return apiClient.request(error.config);
+    }
+    throw error;
+  }
+);
+
+// Type-safe API wrapper
+export const createAPIMethod = <TInput, TOutput>(
+  schema: z.ZodSchema<TOutput>,
+  method: (input: TInput) => Promise<any>
+) => {
+  return async (input: TInput): Promise<TOutput> => {
+    try {
+      const response = await method(input);
+      return schema.parse(response.data);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        console.error('API Response validation error:', error);
+        throw new Error('Invalid API response format');
+      }
+      throw error;
+    }
+  };
+};
+7.2 Venice API Integration
+typescriptCopy// src/services/api/venice.ts
+import { z } from 'zod';
+import { apiClient, createAPIMethod } from './client';
+
+const VENICE_API_KEY = import.meta.env.VITE_VENICE_API_KEY;
+const VENICE_API_URL = import.meta.env.VITE_VENICE_API_URL || 'https://api.venice.ai/v1';
+
+// Response schemas
+const VeniceResponseSchema = z.object({
+  message: z.string(),
+  suggestedQuestions: z.array(z.string()).optional().default([]),
+  metadata: z.object({
+    tokensUsed: z.number(),
+    responseTime: z.number(),
+  }).optional(),
+});
+
+export type VeniceResponse = z.infer<typeof VeniceResponseSchema>;
+
+// Venice API methods
+export const veniceAPI = {
+  sendMessage: createAPIMethod(
+    VeniceResponseSchema,
+    async ({ conceptId, message }: { conceptId: string; message: string }) => {
+      // For demo purposes, return mock data if no API key
+      if (!VENICE_API_KEY) {
+        return {
+          data: {
+            message: `This is a demo response about ${conceptId}. ${getMockResponse(conceptId)}`,
+            suggestedQuestions: [
+              `What are the key features of ${conceptId}?`,
+              `How does ${conceptId} work?`,
+              `What are the risks associated with ${conceptId}?`
+            ],
+            metadata: {
+              tokensUsed: 150,
+              responseTime: 500,
+            }
+          }
+        };
+      }
+
+      return apiClient.post(`${VENICE_API_URL}/chat`, {
+        message,
+        context: conceptId,
+        settings: {
+          privacy: true,
+          concise: true,
+          maxTokens: 150,
+        },
+      }, {
+        headers: {
+          'Authorization': `Bearer ${VENICE_API_KEY}`,
+          'X-Venice-Privacy': 'true',
+        },
+      });
+    }
+  ),
+};
+
+// Mock responses for demo
+const getMockResponse = (conceptId: string): string => {
+  const responses: Record<string, string> = {
+    'circle-usdc': 'Circle is the company behind USDC, one of the largest stablecoins. USDC is backed 1:1 by US dollars held in reserve.',
+    'ipo-basics': 'An IPO (Initial Public Offering) is when a private company offers shares to the public for the first time.',
+    'testnet-explained': 'A testnet is a testing environment for blockchain networks where developers can experiment without using real cryptocurrency.',
+    'market-cap': 'Market capitalization is the total value of all coins/tokens in circulation, calculated by multiplying price by supply.',
+    'tokenomics': 'Tokenomics refers to the economic model of a cryptocurrency, including supply mechanisms, distribution, and incentives.',
+  };
+  
+  return responses[conceptId] || 'This is a fundamental concept in cryptocurrency and blockchain technology.';
+};
+7.3 Gemini API Integration
+typescriptCopy// src/services/api/gemini.ts
+import { GoogleGenerativeAI } from '@google/generative-ai';
+import { z } from 'zod';
+
+const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+
+// Schema for lesson generation
+const LessonGenerationSchema = z.object({
+  title: z.string(),
+  sections: z.array(z.object({
+    title: z.string(),
+    content: z.string(),
+    visualAids: z.array(z.string()).optional(),
+  })),
+  glossary: z.array(z.object({
+    term: z.string(),
+    definition: z.string(),
+  })),
+  sources: z.array(z.object({
+    title: z.string(),
+    url: z.string(),
+    credibility: z.enum(['high', 'medium', 'low']),
+  })),
+});
+
+export type GeneratedLesson = z.infer<typeof LessonGenerationSchema>;
+
+export const generateLesson = async (
+  conceptId: string, 
+  userLevel: 'beginner' | 'intermediate' | 'advanced'
+): Promise<GeneratedLesson> => {
+  // For demo, return mock lesson if no API key
+  if (!GEMINI_API_KEY) {
+    return getMockLesson(conceptId, userLevel);
+  }
+
+  try {
+    const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
+    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+    
+    const prompt = `
+      Generate a comprehensive educational lesson about "${conceptId}" for a ${userLevel} level cryptocurrency learner.
+      
+      The response must be valid JSON matching this exact structure:
+      {
+        "title": "string",
+        "sections": [
+          {
+            "title": "string",
+            "content": "string (markdown supported)",
+            "visualAids": ["optional array of image URLs or descriptions"]
+          }
+        ],
+        "glossary": [
+          {
+            "term": "string",
+            "definition": "string"
+          }
+        ],
+        "sources": [
+          {
+            "title": "string",
+            "url": "string",
+            "credibility": "high" | "medium" | "low"
+          }
+        ]
+      }
+      
+      Include 4-6 sections covering:
+      1. Introduction/Overview
+      2. Core concepts
+      3. How it works
+      4. Real-world applications
+      5. Risks and considerations
+      6. Future outlook
+      
+      Make the content engaging, accurate, and appropriate for the ${userLevel} level.
+    `;
+    
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
+    
+    // Extract JSON from response
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      throw new Error('No valid JSON found in response');
+    }
+    
+    const lessonData = JSON.parse(jsonMatch[0]);
+    return LessonGenerationSchema.parse(lessonData);
+  } catch (error) {
+    console.error('Error generating lesson:', error);
+    // Fallback to mock data
+    return getMockLesson(conceptId, userLevel);
+  }
+};
+
+// Mock lesson generator
+const getMockLesson = (conceptId: string, userLevel: string): GeneratedLesson => {
+  return {
+    title: `Understanding ${conceptId.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}`,
+    sections: [
+      {
+        title: "Introduction",
+        content: `This lesson will help you understand the fundamentals of ${conceptId} at a ${userLevel} level.`,
+      },
+      {
+        title: "Core Concepts",
+        content: "Here we explore the main ideas and principles...",
+      },
+      {
+        title: "How It Works",
+        content: "Let's dive into the mechanics and technical details...",
+      },
+      {
+        title: "Real-World Applications",
+        content: "Understanding practical use cases and implementations...",
+      },
+    ],
+    glossary: [
+      {
+        term: "Blockchain",
+        definition: "A distributed ledger technology that records transactions across multiple computers.",
+      },
+      {
+        term: "Smart Contract",
+        definition: "Self-executing contracts with the terms directly written into code.",
+      },
+    ],
+    sources: [
+      {
+        title: "Official Documentation",
+        url: "https://example.com/docs",
+        credibility: "high",
+      },
+      {
+        title: "Educational Resource",
+        url: "https://example.com/learn",
+        credibility: "medium",
+      },
+    ],
+  };
+};
+7.4 Hooks for API Integration
+typescriptCopy// src/features/chat/hooks/useAIChat.ts
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { veniceAPI } from '@/services/api/venice';
+import { ChatMessage } from '../types';
+import { v4 as uuidv4 } from 'uuid';
+
+export const useAIChat = (conceptId: string) => {
+  const queryClient = useQueryClient();
+  
+  // Fetch chat history from local storage
+  const { data: messages = [] } = useQuery<ChatMessage[]>({
+    queryKey: ['chat', conceptId],
+    queryFn: () => {
+      const stored = localStorage.getItem(`chat-${conceptId}`);
+      return stored ? JSON.parse(stored) : [];
+    },
+    staleTime: Infinity,
+  });
+
+  // Get suggested questions
+  const { data: suggestedQuestions = [] } = useQuery<string[]>({
+    queryKey: ['suggestions', conceptId],
+    queryFn: async () => {
+      // Could fetch from API or generate based on concept
+      return [
+        `What is ${conceptId}?`,
+        `How does ${conceptId} work?`,
+        `What are the benefits of ${conceptId}?`,
+      ];
+    },
+  });
+
+  // Send message mutation
+  const sendMessageMutation = useMutation({
+    mutationFn: async (message: string) => {
+      const userMessage: ChatMessage = {
+        id: uuidv4(),
+        role: 'user',
+        content: message,
+        timestamp: new Date(),
+      };
+
+      // Optimistically add user message
+      const currentMessages = [...messages, userMessage];
+      queryClient.setQueryData(['chat', conceptId], currentMessages);
+      
+      // Get AI response
+      const response = await veniceAPI.sendMessage({ conceptId, message });
+      
+      const aiMessage: ChatMessage = {
+        id: uuidv4(),
+        role: 'assistant',
+        content: response.message,
+        timestamp: new Date(),
+      };
+
+      return { userMessage, aiMessage, suggestions: response.suggestedQuestions };
+    },
+    onSuccess: ({ userMessage, aiMessage, suggestions }) => {
+      const updatedMessages = [...messages, userMessage, aiMessage];
+      
+      // Update cache
+      queryClient.setQueryData(['chat', conceptId], updatedMessages);
+      
+      // Update suggestions
+      if (suggestions && suggestions.length > 0) {
+        queryClient.setQueryData(['suggestions', conceptId], suggestions);
+      }
+      
+      // Persist to localStorage
+      localStorage.setItem(`chat-${conceptId}`, JSON.stringify(updatedMessages));
+    },
+    onError: (error) => {
+      console.error('Chat error:', error);
+      // Revert optimistic update
+      queryClient.setQueryData(['chat', conceptId], messages);
+    },
+  });
+
+  return {
+    messages,
+    suggestedQuestions,
+    sendMessage: sendMessageMutation.mutate,
+    isLoading: sendMessageMutation.isPending,
+  };
+};
+
+// src/features/lessons/hooks/useLessons.ts
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { generateLesson } from '@/services/api/gemini';
+import { Lesson } from '../types';
+import { v4 as uuidv4 } from 'uuid';
+import { useToast } from '@/shared/hooks/useToast';
+
+export const useLessons = () => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  // Fetch all lessons
+  const { data: lessons = [], isLoading } = useQuery<Lesson[]>({
+    queryKey: ['lessons'],
+    queryFn: () => {
+      const stored = localStorage.getItem('lessons');
+      return stored ? JSON.parse(stored) : [];
+    },
+  });
+
+  // Generate new lesson
+  const generateLessonMutation = useMutation({
+    mutationFn: async ({ 
+      conceptId, 
+      conceptTitle, 
+      userLevel = 'beginner' 
+    }: { 
+      conceptId: string; 
+      conceptTitle: string;
+      userLevel?: 'beginner' | 'intermediate' | 'advanced';
+    }) => {
+      // Create lesson placeholder
+      const lessonId = uuidv4();
+      const placeholderLesson: Lesson = {
+        id: lessonId,
+        conceptId,
+        title: conceptTitle,
+        sections: [],
+        glossary: [],
+        sources: [],
+        createdAt: new Date(),
+        userLevel,
+        status: 'generating',
+      };
+
+      // Add placeholder to list
+      const currentLessons = [...lessons, placeholderLesson];
+      queryClient.setQueryData(['lessons'], currentLessons);
+      localStorage.setItem('lessons', JSON.stringify(currentLessons));
+
+      // Show notification
+      toast({
+        title: "Generating Lesson",
+        description: `Creating a comprehensive lesson about ${conceptTitle}...`,
+        duration: 5000,
+      });
+
+      // Generate lesson
+      const generatedContent = await generateLesson(conceptId, userLevel);
+      
+      // Create complete lesson
+      const completeLesson: Lesson = {
+        ...placeholderLesson,
+        ...generatedContent,
+        status: 'ready',
+      };
+
+      return completeLesson;
+    },
+    onSuccess: (lesson) => {
+      // Update lesson in list
+      const updatedLessons = lessons.map(l => 
+        l.id === lesson.id ? lesson : l
+      );
+      
+      queryClient.setQueryData(['lessons'], updatedLessons);
+      localStorage.setItem('lessons', JSON.stringify(updatedLessons));
+
+      toast({
+        title: "Lesson Ready!",
+        description: `Your lesson about ${lesson.title} is ready to view.`,
+        action: {
+          label: "View",
+          onClick: () => {
+            // Navigate to lesson
+            window.location.href = `/lessons/${lesson.id}`;
+          },
+        },
+      });
+    },
+    onError: (error) => {
+      console.error('Lesson generation error:', error);
+      toast({
+        title: "Generation Failed",
+        description: "Failed to generate lesson. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  return {
+    lessons,
+    isLoading,
+    generateLesson: generateLessonMutation.mutate,
+    isGenerating: generateLessonMutation.isPending,
+  };
+};
+
+8. Step-by-Step Build Order
+Phase 1: Project Setup (30 minutes)
+
+Initialize Vite project with React TypeScript template
+Install all dependencies
+Set up folder structure
+Configure Tailwind CSS
+Add design tokens and global styles
+Set up environment variables
+Configure TypeScript paths
+
+Phase 2: Core Infrastructure (45 minutes)
+
+Implement utility functions (cn.ts)
+Set up API client base
+Configure React Query provider
+Create theme provider
+Set up React Router
+Implement basic layout component
+Create navigation component
+
+Phase 3: Design System Components (45 minutes)
+
+Install and configure ShadCN UI components
+Create custom button variants
+Implement glassmorphism styles
+Create modal components
+Add scroll area component
+Implement loading states
+
+Phase 4: Landing Page (30 minutes)
+
+Create landing page component
+Add hero section with gradient text
+Implement CTA button
+Add animations with Framer Motion
+Ensure responsive design
+
+Phase 5: Insights Feature (60 minutes)
+
+Create insight types and sample data
+Implement InsightCard component
+Add hyperlink rendering logic
+Create InsightModal with navigation
+Implement progress indicators
+Add useInsights hook
+Connect to dashboard page
+
+Phase 6: Chat Integration (60 minutes)
+
+Implement Venice API service
+Create ChatModal component
+Add ChatMessage component
+Implement FloatingChatButton
+Create useAIChat hook
+Add suggested questions
+Implement chat persistence
+
+Phase 7: Lessons Feature (30 minutes)
+
+Create lesson types
+Implement Gemini API service (with mocks)
+Create lesson generation flow
+Add lesson list component
+Implement useLessons hook
+Add notifications for generation
+
+Phase 8: Polish & Testing (30 minutes)
+
+Add error boundaries
+Implement loading states
+Test all user flows
+Add keyboard navigation
+Ensure mobile responsiveness
+Performance optimization
+Final styling touches
+
+
+9. Testing & Validation
+9.1 Key User Flows to Test
+
+Landing → Dashboard Navigation
+
+Click "Let's go!" button
+Verify navigation to dashboard
+
+
+Insight Browsing
+
+Open insights modal
+Navigate with arrows/dots
+Click hyperlinks
+Click tags
+
+
+Chat Interaction
+
+Click hyperlink in insight
+Send message
+Use suggested questions
+Generate lesson
+
+
+Lesson Generation
+
+Click "Create Deep Lesson"
+See notification
+View lesson list
+Open generated lesson
+
+
+
+9.2 API Testing Checklist
+
+ Venice API mock responses work
+ Gemini API mock responses work
+ Error handling for API failures
+ Rate limit handling
+ Loading states display correctly
+
+9.3 UI/UX Checklist
+
+ Glassmorphism effects render correctly
+ Animations are smooth
+ All buttons have hover states
+ Modals open/close properly
+ Text is readable on all backgrounds
+ Responsive on different screen sizes
+
+
+10. Common Pitfalls & Solutions
+10.1 Environment Variables
+Pitfall: APIs not working due to missing env vars
+Solution: Use mock data when API keys are not present
+10.2 TypeScript Errors
+Pitfall: Strict mode causing build errors
+Solution: Use proper type definitions, avoid 'any' types
+10.3 State Management
+Pitfall: Chat history lost on refresh
+Solution: Persist to localStorage, hydrate on mount
+10.4 Performance Issues
+Pitfall: Large bundle size
+Solution: Use code splitting, lazy load modals
+10.5 Styling Conflicts
+Pitfall: Tailwind classes not applying
+Solution: Check content paths in config, use cn() utility
+10.6 API Rate Limits
+Pitfall: Too many requests to AI APIs
+Solution: Implement request debouncing, caching
+10.7 Animation Jank
+Pitfall: Choppy animations on slower devices
+Solution: Use transform/opacity only, add will-change
+
+Conclusion
+This comprehensive PRD provides a complete blueprint for building the CryptoLearn AI Platform prototype. Follow the step-by-step build order, reference the detailed component implementations, and use the testing checklist to ensure a high-quality deliverable within the 4-hour timeframe.
+Key success factors:
+
+Start with core infrastructure
+Use mock data for quick development
+Focus on user experience
+Implement proper error handling
+Maintain clean, typed code throughout
+
+The implementation demonstrates senior-level React expertise through proper architecture, modern patterns, and production-ready code quality.

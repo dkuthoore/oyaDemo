@@ -279,48 +279,6 @@ export const mockLessons: Lesson[] = [
       },
     ],
   },
-  {
-    id: "4",
-    title: "Ethereum Scaling and L2s",
-    description:
-      "Explore Ethereum scaling solutions including Layer 2 networks, rollups, and sidechains. Learn about Polygon, Optimism, Arbitrum, and the future of blockchain scalability.",
-    duration: "55 min",
-    level: "Intermediate",
-    progress: 0,
-    status: "Available",
-    icon: "Network",
-    tags: ["Layer 2", "Scaling", "Gas Fees"],
-    sections: [
-      {
-        id: "4-1",
-        title: "Scaling Problem Overview",
-        duration: "12 min",
-        completed: false,
-        content: "Why Ethereum needs scaling solutions",
-      },
-      {
-        id: "4-2",
-        title: "Layer 2 Technologies",
-        duration: "18 min",
-        completed: false,
-        content: "Rollups, sidechains, and state channels",
-      },
-      {
-        id: "4-3",
-        title: "Major L2 Networks",
-        duration: "20 min",
-        completed: false,
-        content: "Polygon, Optimism, Arbitrum deep dive",
-      },
-      {
-        id: "4-4",
-        title: "Using L2 Networks",
-        duration: "5 min",
-        completed: false,
-        content: "Bridging assets and interacting with L2s",
-      },
-    ],
-  },
 ];
 
 export const mockStats: StatsData = {

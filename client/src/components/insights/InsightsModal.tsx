@@ -26,7 +26,7 @@ export default function InsightsModal() {
 
   const handleConceptClick = (conceptId: string) => {
     openChat(conceptId);
-    closeInsightsModal();
+    // Keep the insights modal open when chat opens
   };
 
   const renderContent = () => {

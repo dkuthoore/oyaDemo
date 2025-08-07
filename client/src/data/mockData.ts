@@ -62,7 +62,7 @@ export const mockInsights: Insight[] = [
       {
         text: 'supply cap',
         conceptId: 'supply-cap',
-        position: { start: 137, end: 147 },
+        position: { start: 134, end: 144 },
         type: 'simple'
       }
     ]
@@ -84,7 +84,7 @@ export const mockInsights: Insight[] = [
       {
         text: 'gas limit',
         conceptId: 'gas-limit',
-        position: { start: 59, end: 68 },
+        position: { start: 60, end: 69 },
         type: 'simple'
       }
     ]
@@ -150,165 +150,165 @@ export const mockInsights: Insight[] = [
 export const mockLessons: Lesson[] = [
   {
     id: '1',
-    title: 'Blockchain Fundamentals',
-    description: 'Master the core concepts of blockchain technology, from distributed ledgers to consensus mechanisms. Learn how transactions work and understand the security principles that make blockchain revolutionary.',
-    duration: '45 min',
+    title: 'Stablecoins',
+    description: 'Learn about stablecoins, the crypto assets designed to maintain stable value. Understand different types, mechanisms, and their role in the digital economy.',
+    duration: '35 min',
     level: 'Beginner',
-    progress: 75,
+    progress: 85,
     status: 'Completed',
-    icon: 'Cubes',
-    tags: ['Distributed Ledger', 'Consensus', 'Security'],
+    icon: 'DollarSign',
+    tags: ['Stablecoins', 'USDC', 'Tether'],
     sections: [
       {
         id: '1-1',
-        title: 'Introduction to Blockchain',
+        title: 'What are Stablecoins?',
         duration: '8 min',
         completed: true,
-        content: 'What is blockchain and why it matters'
+        content: 'Introduction to price-stable cryptocurrencies'
       },
       {
         id: '1-2',
-        title: 'Distributed Ledger Technology',
+        title: 'Types of Stablecoins',
         duration: '12 min',
         completed: true,
-        content: 'Understanding distributed systems'
+        content: 'Fiat-collateralized, crypto-collateralized, and algorithmic'
       },
       {
         id: '1-3',
-        title: 'Consensus Mechanisms',
-        duration: '15 min',
-        completed: false,
-        content: 'How networks agree on truth'
+        title: 'Major Stablecoin Projects',
+        duration: '10 min',
+        completed: true,
+        content: 'USDC, USDT, DAI and their mechanisms'
       },
       {
         id: '1-4',
-        title: 'Cryptographic Principles',
-        duration: '10 min',
+        title: 'Use Cases and Risks',
+        duration: '5 min',
         completed: false,
-        content: 'Security through mathematics'
+        content: 'DeFi, payments, and regulatory considerations'
       }
     ]
   },
   {
     id: '2',
-    title: 'DeFi Protocols Deep Dive',
-    description: 'Explore the ecosystem of decentralized finance protocols. Understand AMMs, yield farming, lending protocols, and how to navigate the DeFi landscape safely and profitably.',
-    duration: '60 min',
+    title: 'Tokenomics',
+    description: 'Master the economics of crypto tokens. Learn about supply mechanisms, distribution models, utility design, and how tokenomics affects project success.',
+    duration: '50 min',
     level: 'Intermediate',
-    progress: 45,
+    progress: 60,
     status: 'In Progress',
-    icon: 'ArrowLeftRight',
-    tags: ['AMM', 'Yield Farming', 'Lending'],
+    icon: 'TrendingUp',
+    tags: ['Supply Cap', 'Token Distribution', 'Utility'],
     sections: [
       {
         id: '2-1',
-        title: 'DeFi Ecosystem Overview',
-        duration: '10 min',
+        title: 'Token Supply Mechanics',
+        duration: '12 min',
         completed: true,
-        content: 'Understanding the DeFi landscape'
+        content: 'Fixed vs inflationary supply models'
       },
       {
         id: '2-2',
-        title: 'Automated Market Makers',
+        title: 'Distribution Strategies',
         duration: '15 min',
         completed: true,
-        content: 'How AMMs enable trading'
+        content: 'ICOs, airdrops, mining, and staking rewards'
       },
       {
         id: '2-3',
-        title: 'Yield Farming Strategies',
-        duration: '20 min',
+        title: 'Token Utility Design',
+        duration: '18 min',
         completed: false,
-        content: 'Earning rewards in DeFi'
+        content: 'Governance, payments, and protocol access'
       },
       {
         id: '2-4',
-        title: 'Lending and Borrowing',
-        duration: '15 min',
+        title: 'Valuation Models',
+        duration: '5 min',
         completed: false,
-        content: 'DeFi money markets'
+        content: 'How to assess token value propositions'
       }
     ]
   },
   {
     id: '3',
-    title: 'Smart Contract Development',
-    description: 'Learn to build and deploy smart contracts on Ethereum. Cover Solidity programming, security best practices, gas optimization, and testing methodologies for production-ready contracts.',
-    duration: '90 min',
-    level: 'Advanced',
-    progress: 15,
-    status: 'Locked',
-    icon: 'Code',
-    tags: ['Solidity', 'Security', 'Testing'],
+    title: 'Crypto Wallet Security 101',
+    description: 'Essential security practices for protecting your crypto assets. Learn about private keys, seed phrases, hardware wallets, and how to avoid common security pitfalls.',
+    duration: '40 min',
+    level: 'Beginner',
+    progress: 30,
+    status: 'In Progress',
+    icon: 'Shield',
+    tags: ['Private Keys', 'Hardware Wallets', 'Security'],
     sections: [
       {
         id: '3-1',
-        title: 'Solidity Basics',
-        duration: '25 min',
-        completed: false,
-        content: 'Programming language for smart contracts'
+        title: 'Understanding Private Keys',
+        duration: '10 min',
+        completed: true,
+        content: 'The foundation of crypto ownership'
       },
       {
         id: '3-2',
-        title: 'Contract Architecture',
-        duration: '20 min',
+        title: 'Seed Phrase Security',
+        duration: '12 min',
         completed: false,
-        content: 'Designing secure contracts'
+        content: 'Backup and recovery best practices'
       },
       {
         id: '3-3',
-        title: 'Security Best Practices',
-        duration: '25 min',
+        title: 'Hardware vs Software Wallets',
+        duration: '15 min',
         completed: false,
-        content: 'Common vulnerabilities and fixes'
+        content: 'Choosing the right wallet type'
       },
       {
         id: '3-4',
-        title: 'Testing and Deployment',
-        duration: '20 min',
+        title: 'Common Security Mistakes',
+        duration: '3 min',
         completed: false,
-        content: 'Ensuring contract reliability'
+        content: 'How to avoid losing your crypto'
       }
     ]
   },
   {
     id: '4',
-    title: 'Crypto Security Masterclass',
-    description: 'Comprehensive security guide covering wallet security, private key management, identifying scams, and protecting your digital assets in the ever-evolving crypto landscape.',
-    duration: '75 min',
+    title: 'Ethereum Scaling and L2s',
+    description: 'Explore Ethereum scaling solutions including Layer 2 networks, rollups, and sidechains. Learn about Polygon, Optimism, Arbitrum, and the future of blockchain scalability.',
+    duration: '55 min',
     level: 'Intermediate',
     progress: 0,
     status: 'Available',
-    icon: 'Shield',
-    tags: ['Wallet Security', 'Private Keys', 'Scam Prevention'],
+    icon: 'Network',
+    tags: ['Layer 2', 'Scaling', 'Gas Fees'],
     sections: [
       {
         id: '4-1',
-        title: 'Wallet Security Fundamentals',
-        duration: '20 min',
+        title: 'Scaling Problem Overview',
+        duration: '12 min',
         completed: false,
-        content: 'Protecting your crypto assets'
+        content: 'Why Ethereum needs scaling solutions'
       },
       {
         id: '4-2',
-        title: 'Private Key Management',
+        title: 'Layer 2 Technologies',
         duration: '18 min',
         completed: false,
-        content: 'Your keys, your crypto'
+        content: 'Rollups, sidechains, and state channels'
       },
       {
         id: '4-3',
-        title: 'Identifying Scams',
-        duration: '22 min',
+        title: 'Major L2 Networks',
+        duration: '20 min',
         completed: false,
-        content: 'Common attack vectors'
+        content: 'Polygon, Optimism, Arbitrum deep dive'
       },
       {
         id: '4-4',
-        title: 'Cold Storage Solutions',
-        duration: '15 min',
+        title: 'Using L2 Networks',
+        duration: '5 min',
         completed: false,
-        content: 'Ultimate security setup'
+        content: 'Bridging assets and interacting with L2s'
       }
     ]
   }

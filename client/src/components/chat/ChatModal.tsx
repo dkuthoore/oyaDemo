@@ -164,9 +164,30 @@ export default function ChatModal() {
 
   const getConceptDisplayName = (conceptId: string) => {
     if (conceptId === 'general') return 'General Chat';
-    return conceptId.split('-').map(word => 
+    
+    // Use the same concept mapping as the server for consistency
+    const conceptMap: Record<string, string> = {
+      'stablecoin': 'Stablecoins',
+      'circle': 'Circle',
+      'oya-protocol': 'Oya Protocol',
+      'testnet': 'Testnets',
+      'dogecoin': 'Dogecoin',
+      'supply-cap': 'Supply Cap',
+      'hardfork': 'Hardforks',
+      'gas-limit': 'Gas Limits',
+      'private-keys': 'Private Keys',
+      'seed-phrases': 'Seed Phrases',
+      'cold-storage': 'Cold Storage',
+      'layer2': 'Layer 2',
+      'optimism': 'Optimism',
+      'arbitrum': 'Arbitrum'
+    };
+    
+    const conceptName = conceptMap[conceptId] || conceptId.split('-').map(word => 
       word.charAt(0).toUpperCase() + word.slice(1)
     ).join(' ');
+    
+    return `Topic: ${conceptName}`;
   };
 
   return (

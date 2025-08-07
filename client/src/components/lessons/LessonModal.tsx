@@ -14,6 +14,17 @@ export default function LessonModal() {
   const [selectedAnswers, setSelectedAnswers] = useState<Record<number, string>>({});
   const [showQuizResults, setShowQuizResults] = useState(false);
 
+  useEffect(() => {
+    if (isLessonModalOpen) {
+      setCurrentSectionIndex(0);
+      setCompletedSections(new Set());
+      setShowQuiz(false);
+      setSelectedAnswers({});
+      setShowQuizResults(false);
+    }
+  }, [isLessonModalOpen]);
+
+  // Early return after all hooks are declared
   if (!currentLesson) return null;
 
   // Check if this is a generated lesson
@@ -31,16 +42,6 @@ export default function LessonModal() {
 
   const totalSections = sections.length;
   const allSectionsCompleted = completedSections.size === totalSections;
-
-  useEffect(() => {
-    if (isLessonModalOpen) {
-      setCurrentSectionIndex(0);
-      setCompletedSections(new Set());
-      setShowQuiz(false);
-      setSelectedAnswers({});
-      setShowQuizResults(false);
-    }
-  }, [isLessonModalOpen]);
 
   const markSectionComplete = () => {
     setCompletedSections(prev => new Set(prev).add(currentSectionIndex));

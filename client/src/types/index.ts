@@ -39,6 +39,14 @@ export interface Lesson {
   icon: string;
   tags: string[];
   sections: LessonSection[];
+  generatedData?: {
+    summary: string;
+    tableOfContents: Record<string, string>;
+    content: any[];
+    quiz: any[];
+  };
+  createdAt?: string;
+  topic?: string;
 }
 
 export interface LessonSection {

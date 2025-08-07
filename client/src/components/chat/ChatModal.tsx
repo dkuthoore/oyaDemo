@@ -180,23 +180,48 @@ export default function ChatModal() {
         description: `Your ${conceptDisplayName} lesson is ready!`,
       });
 
-      closeChat();
-      // Close insights modal if it's open
-      const { closeInsightModal } = useAppStore.getState();
-      closeInsightModal();
+      // Close all modals first
+      const { closeAllModals, openLessonModal } = useAppStore.getState();
+      closeAllModals();
       
       setTimeout(() => {
         setLocation('/lessons');
         // Store the lesson in localStorage for now (we can implement proper storage later)
         const existingLessons = JSON.parse(localStorage.getItem('generatedLessons') || '[]');
         const lessonWithId = {
-          ...generatedLesson,
           id: Date.now().toString(),
+          title: generatedLesson.title,
+          description: generatedLesson.summary,
+          duration: "45 min",
+          level: "Intermediate" as const,
+          progress: 0,
+          status: "Available" as const,
+          icon: "📚",
+          tags: ["AI Generated", "Interactive"],
+          sections: generatedLesson.content.map((section: any, index: number) => ({
+            id: `section-${index}`,
+            title: section.title,
+            duration: "5 min",
+            completed: false,
+            content: section.content
+          })),
+          // Store additional generated data for the lesson modal
+          generatedData: {
+            summary: generatedLesson.summary,
+            tableOfContents: generatedLesson.tableOfContents,
+            content: generatedLesson.content,
+            quiz: generatedLesson.quiz
+          },
           createdAt: new Date().toISOString(),
           topic: currentChatConcept
         };
         existingLessons.push(lessonWithId);
         localStorage.setItem('generatedLessons', JSON.stringify(existingLessons));
+        
+        // Open the lesson modal with the newly generated lesson
+        setTimeout(() => {
+          openLessonModal(lessonWithId);
+        }, 100); // Small delay to ensure page navigation is complete
       }, 1500);
 
     } catch (error) {

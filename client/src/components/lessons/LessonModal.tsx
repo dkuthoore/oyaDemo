@@ -28,8 +28,8 @@ export default function LessonModal() {
   if (!currentLesson) return null;
 
   // Check if this is a generated lesson
-  const isGeneratedLesson = (currentLesson as any).isGenerated;
-  const generatedContent = isGeneratedLesson ? (currentLesson as any).generatedContent : null;
+  const isGeneratedLesson = Boolean(currentLesson.generatedData);
+  const generatedContent = currentLesson.generatedData;
   
   // Get sections based on lesson type
   const sections = isGeneratedLesson && generatedContent 
@@ -61,7 +61,7 @@ export default function LessonModal() {
     } else if (currentSectionIndex === totalSections - 1 && !showQuiz) {
       // Mark the final section complete and show quiz if available
       markSectionComplete();
-      if (isGeneratedLesson && generatedContent?.quiz) {
+      if (isGeneratedLesson && generatedContent?.quiz && generatedContent.quiz.length > 0) {
         setShowQuiz(true);
       }
     }

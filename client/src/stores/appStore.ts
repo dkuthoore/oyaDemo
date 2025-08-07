@@ -35,6 +35,7 @@ interface AppState {
   
   openLessonModal: (lesson: Lesson) => void;
   closeLessonModal: () => void;
+  closeAllModals: () => void;
 }
 
 export const useAppStore = create<AppState>()(
@@ -190,6 +191,17 @@ export const useAppStore = create<AppState>()(
       
       closeLessonModal: () => {
         set({ 
+          isLessonModalOpen: false,
+          currentLesson: null
+        });
+      },
+
+      closeAllModals: () => {
+        set({
+          isChatOpen: false,
+          isInsightModalOpen: false,
+          currentInsight: null,
+          isInsightsModalOpen: false,
           isLessonModalOpen: false,
           currentLesson: null
         });

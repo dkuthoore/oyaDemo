@@ -121,6 +121,39 @@
   .hero-text {
     font-size: clamp(3rem, 10vw, 6rem);
   }
+
+  /* Chat message markdown styling */
+  .chat-markdown h1, .chat-markdown h2, .chat-markdown h3 {
+    @apply text-white font-semibold mb-2;
+  }
+  
+  .chat-markdown h1 { @apply text-base; }
+  .chat-markdown h2 { @apply text-sm; }
+  .chat-markdown h3 { @apply text-sm; }
+  
+  .chat-markdown p {
+    @apply text-white/90 mb-2 leading-relaxed;
+  }
+  
+  .chat-markdown ul, .chat-markdown ol {
+    @apply text-white/90 mb-2 pl-4;
+  }
+  
+  .chat-markdown li {
+    @apply mb-1;
+  }
+  
+  .chat-markdown strong, .chat-markdown b {
+    @apply text-white font-semibold;
+  }
+  
+  .chat-markdown code {
+    @apply bg-white/10 text-yellow-300 px-1 rounded text-xs;
+  }
+  
+  .chat-markdown blockquote {
+    @apply border-l-2 border-white/30 pl-3 text-white/80 italic;
+  }
 }
 
 @layer utilities {

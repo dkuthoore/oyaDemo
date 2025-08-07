@@ -33,7 +33,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     };
 
     const conceptName = conceptMap[concept] || concept;
-    return `Give me a brief overview of ${conceptName}`;
+    return `Give me a brief, concise overview of ${conceptName}. Format your response using markdown with clear headings and bullet points where appropriate. Keep your response to 2 paragraphs or less.`;
   };
 
   // Chat endpoint with streaming
@@ -45,8 +45,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(500).json({ error: 'Gemini API not configured' });
       }
 
-      // Use concept prompt if provided, otherwise use the user message
-      const prompt = concept ? getConceptPrompt(concept) : message;
+      // Use concept prompt if provided, otherwise use the user message with formatting instructions
+      const prompt = concept ? getConceptPrompt(concept) : `${message}\n\nPlease format your response using markdown with clear headings and bullet points where appropriate. Keep your response concise and to 2 paragraphs or less.`;
       
       // Set up streaming response
       res.setHeader('Content-Type', 'text/plain');

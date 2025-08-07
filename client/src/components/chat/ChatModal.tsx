@@ -8,6 +8,7 @@ import { useLocation } from 'wouter';
 import { useToast } from '@/hooks/use-toast';
 import { chatService } from '@/lib/chatService';
 import { ChatMessage } from '@/types';
+import ReactMarkdown from 'react-markdown';
 
 export default function ChatModal() {
   const [input, setInput] = useState('');
@@ -26,9 +27,12 @@ export default function ChatModal() {
 
   useEffect(() => {
     if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      const scrollElement = scrollRef.current.querySelector('[data-radix-scroll-area-viewport]');
+      if (scrollElement) {
+        scrollElement.scrollTop = scrollElement.scrollHeight;
+      }
     }
-  }, [chatMessages]);
+  }, [chatMessages, isGeneratingResponse]);
 
   const handleSend = async () => {
     if (input.trim() && !isGeneratingResponse) {
@@ -65,6 +69,14 @@ export default function ChatModal() {
             }
             
             fullResponse += value;
+            // Update the AI message with accumulated response in real-time
+            const currentMessages = useAppStore.getState().chatMessages;
+            const updatedMessages = currentMessages.map(msg => 
+              msg.id === aiMessage.id 
+                ? { ...msg, content: fullResponse }
+                : msg
+            );
+            useAppStore.setState({ chatMessages: updatedMessages });
             readStream();
           }).catch((error: any) => {
             console.error('Stream reading error:', error);
@@ -113,6 +125,14 @@ export default function ChatModal() {
           }
           
           fullResponse += value;
+          // Update the AI message with accumulated response in real-time
+          const currentMessages = useAppStore.getState().chatMessages;
+          const updatedMessages = currentMessages.map(msg => 
+            msg.id === aiMessage.id 
+              ? { ...msg, content: fullResponse }
+              : msg
+          );
+          useAppStore.setState({ chatMessages: updatedMessages });
           readStream();
         }).catch((error: any) => {
           console.error('Stream reading error:', error);
@@ -152,7 +172,7 @@ export default function ChatModal() {
   return (
     <Dialog open={isChatOpen} onOpenChange={closeChat}>
       <DialogContent 
-        className="glassmorphism border-glassmorphism-border max-w-md max-h-[70vh] flex flex-col p-0 fixed bottom-20 right-6 left-auto top-auto translate-x-0 translate-y-0"
+        className="glassmorphism border-glassmorphism-border max-w-md h-[600px] flex flex-col p-0 fixed bottom-20 right-6 left-auto top-auto translate-x-0 translate-y-0"
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
         {/* Header */}
@@ -180,8 +200,8 @@ export default function ChatModal() {
         </div>
 
         {/* Messages */}
-        <ScrollArea ref={scrollRef} className="flex-1 p-6">
-          <div className="space-y-4">
+        <ScrollArea ref={scrollRef} className="flex-1 p-6 overflow-y-auto">
+          <div className="space-y-4 min-h-0">
             {chatMessages.length === 0 && (
               <div className="flex items-start space-x-3">
                 <div className="w-8 h-8 bg-gradient-secondary rounded-full flex items-center justify-center flex-shrink-0">
@@ -210,7 +230,9 @@ export default function ChatModal() {
                 )}
                 
                 <div className="glassmorphism rounded-lg p-3 max-w-[80%]">
-                  <p className="text-sm">{message.content}</p>
+                  <div className="text-sm chat-markdown">
+                    <ReactMarkdown>{message.content}</ReactMarkdown>
+                  </div>
                 </div>
                 
                 {message.role === 'user' && (

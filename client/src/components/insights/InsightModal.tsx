@@ -4,12 +4,12 @@ import { Button } from '@/components/ui/button';
 import { useAppStore } from '@/stores/appStore';
 
 export default function InsightModal() {
-  const { isInsightModalOpen, currentInsight, closeInsightModal, openChat, openLessonModal } = useAppStore();
+  const { isInsightModalOpen, currentInsight, closeInsightModal, openChatWithConcept, openLessonModal } = useAppStore();
 
   if (!currentInsight) return null;
 
   const handleHyperlinkClick = (conceptId: string) => {
-    openChat(conceptId);
+    openChatWithConcept(conceptId);
   };
 
   const renderContentWithHyperlinks = () => {
@@ -140,7 +140,7 @@ export default function InsightModal() {
             <Button
               onClick={() => {
                 closeInsightModal();
-                openChat(currentInsight.hyperlinks[0]?.conceptId || 'general');
+                openChatWithConcept(currentInsight.hyperlinks[0]?.conceptId || 'general');
               }}
               variant="ghost"
               className="px-6 py-3 glassmorphism text-text-primary rounded-lg hover:scale-105 transition-all duration-300"

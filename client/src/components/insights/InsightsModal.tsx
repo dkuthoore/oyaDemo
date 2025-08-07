@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
 export default function InsightsModal() {
-  const { isInsightsModalOpen, closeInsightsModal, currentInsightIndex, setCurrentInsightIndex, openChat } = useAppStore();
+  const { isInsightsModalOpen, closeInsightsModal, currentInsightIndex, setCurrentInsightIndex, openChatWithConcept } = useAppStore();
   const { data: insights, isLoading } = useInsights();
 
   const currentInsight = insights?.[currentInsightIndex];
@@ -25,7 +25,7 @@ export default function InsightsModal() {
   };
 
   const handleConceptClick = (conceptId: string) => {
-    openChat(conceptId);
+    openChatWithConcept(conceptId);
     // Keep the insights modal open when chat opens
   };
 

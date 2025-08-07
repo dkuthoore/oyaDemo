@@ -209,7 +209,7 @@ export default function ChatModal() {
                 </div>
                 <div className="glassmorphism rounded-lg p-3 max-w-[80%]">
                   <p className="text-sm">
-                    Hello! I'm your AI assistant. I can help explain crypto concepts, answer questions about DeFi, blockchain technology, and more. What would you like to learn about?
+                    How can I help you?
                   </p>
                 </div>
               </div>

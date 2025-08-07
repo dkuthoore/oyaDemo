@@ -7,11 +7,11 @@ interface InsightCardProps {
 }
 
 export default function InsightCard({ insight }: InsightCardProps) {
-  const { openInsightModal, openChat } = useAppStore();
+  const { openInsightModal, openChatWithConcept } = useAppStore();
 
   const handleHyperlinkClick = (e: React.MouseEvent, conceptId: string) => {
     e.stopPropagation();
-    openChat(conceptId);
+    openChatWithConcept(conceptId);
   };
 
   const renderContentWithHyperlinks = () => {
@@ -95,7 +95,7 @@ export default function InsightCard({ insight }: InsightCardProps) {
               key={tag}
               onClick={(e) => {
                 e.stopPropagation();
-                openChat(tag.toLowerCase().replace(/\s+/g, '-'));
+                openChatWithConcept(tag.toLowerCase().replace(/\s+/g, '-'));
               }}
               className="px-2 py-1 bg-white/10 rounded-md text-xs hover:bg-white/20 transition-colors"
               data-testid={`tag-${tag.toLowerCase().replace(/\s+/g, '-')}`}

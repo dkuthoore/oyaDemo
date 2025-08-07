@@ -19,7 +19,8 @@ interface AppState {
   currentLesson: Lesson | null;
   
   // Actions
-  openChat: (conceptId: string) => void;
+  openChat: (conceptId?: string) => void;
+  openChatWithConcept: (conceptId: string) => void;
   closeChat: () => void;
   addChatMessage: (message: ChatMessage) => void;
   clearChatMessages: () => void;
@@ -52,7 +53,15 @@ export const useAppStore = create<AppState>()(
       currentLesson: null,
       
       // Actions
-      openChat: (conceptId: string) => {
+      openChat: (conceptId?: string) => {
+        set({ 
+          isChatOpen: true, 
+          currentChatConcept: conceptId || 'general',
+          chatMessages: [] // Start with empty messages for manual chat opening
+        });
+      },
+
+      openChatWithConcept: (conceptId: string) => {
         const conceptDisplayName = chatService.getConceptDisplayName(conceptId);
         
         // Add concept as user message when opening from hyperlink

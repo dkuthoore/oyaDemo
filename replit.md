@@ -1,10 +1,10 @@
-# CryptoLearn AI Platform
+# OyaChat Demo
 
 ## Overview
 
-CryptoLearn AI Platform is a React-based learning application designed to teach cryptocurrency and blockchain concepts through interactive insights, AI-powered explanations, and comprehensive lesson modules. The platform features a modern glassmorphism design with crypto-focused aesthetics and demonstrates senior React engineering patterns.
+OyaChat Demo is a React-based prototype showcasing AI-powered cryptocurrency learning through interactive insights, chat assistance, and comprehensive lessons. The platform features a modern glassmorphism design with a simplified user interface focused on demonstrating key user flows.
 
-The application provides three core learning modes: insight cards with hyperlinked concepts for quick exploration, AI chat assistance for immediate explanations, and deep lesson modules for comprehensive learning. Users can interact with cryptocurrency content through clickable concepts that trigger AI explanations, creating an engaging and educational experience.
+The application provides three core features: insights carousel modal with hyperlinked concepts for quick exploration, AI chat assistance with lesson creation capabilities, and comprehensive lesson modules with quiz functionality. Users can click on crypto concepts to trigger AI explanations, creating an engaging educational experience.
 
 ## User Preferences
 

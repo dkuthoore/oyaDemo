@@ -2,14 +2,16 @@ import { motion } from 'framer-motion';
 import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Brain, Lightbulb, MessageCircle, GraduationCap } from 'lucide-react';
+import { useAppStore } from '@/stores/appStore';
 
 export default function Landing() {
   const [, setLocation] = useLocation();
+  const { openInsightsModal } = useAppStore();
 
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="min-h-screen flex items-center justify-center pt-20 px-6">
+      <section className="min-h-screen flex items-center justify-center px-6">
         <div className="max-w-7xl mx-auto">
           <div className="text-center">
             <motion.h1
@@ -35,10 +37,10 @@ export default function Landing() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
-              className="flex flex-col sm:flex-row gap-4 justify-center mb-16"
+              className="flex flex-col sm:flex-row gap-4 justify-center"
             >
               <Button
-                onClick={() => setLocation('/dashboard')}
+                onClick={openInsightsModal}
                 className="px-8 py-4 bg-gradient-primary text-white font-medium rounded-xl hover:scale-105 transition-all duration-300 shadow-purple-glow"
                 data-testid="button-explore-insights"
               >
@@ -52,38 +54,6 @@ export default function Landing() {
               >
                 Start Learning
               </Button>
-            </motion.div>
-            
-            {/* Feature Cards */}
-            <motion.div
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.6 }}
-              className="grid md:grid-cols-3 gap-8 mt-16"
-            >
-              <div className="glassmorphism rounded-2xl p-8 hover:shadow-card-glow transition-all duration-300 group">
-                <div className="w-16 h-16 bg-gradient-secondary rounded-xl flex items-center justify-center mb-6 mx-auto group-hover:scale-110 transition-transform duration-300">
-                  <Lightbulb className="text-white text-2xl" size={32} />
-                </div>
-                <h3 className="text-xl font-semibold mb-4">Smart Insights</h3>
-                <p className="text-text-secondary leading-relaxed">Interactive crypto insights with hyperlinked concepts for deeper understanding.</p>
-              </div>
-              
-              <div className="glassmorphism rounded-2xl p-8 hover:shadow-card-glow transition-all duration-300 group">
-                <div className="w-16 h-16 bg-gradient-copy rounded-xl flex items-center justify-center mb-6 mx-auto group-hover:scale-110 transition-transform duration-300">
-                  <MessageCircle className="text-white text-2xl" size={32} />
-                </div>
-                <h3 className="text-xl font-semibold mb-4">AI Chat Assistant</h3>
-                <p className="text-text-secondary leading-relaxed">Get instant explanations and clarifications through our privacy-focused AI chat.</p>
-              </div>
-              
-              <div className="glassmorphism rounded-2xl p-8 hover:shadow-card-glow transition-all duration-300 group">
-                <div className="w-16 h-16 bg-gradient-primary rounded-xl flex items-center justify-center mb-6 mx-auto group-hover:scale-110 transition-transform duration-300">
-                  <GraduationCap className="text-white text-2xl" size={32} />
-                </div>
-                <h3 className="text-xl font-semibold mb-4">Deep Lessons</h3>
-                <p className="text-text-secondary leading-relaxed">Comprehensive learning modules with structured content and interactive elements.</p>
-              </div>
             </motion.div>
           </div>
         </div>

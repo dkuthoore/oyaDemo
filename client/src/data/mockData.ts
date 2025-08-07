@@ -3,113 +3,83 @@ import { Insight, Lesson, StatsData } from '@/types';
 export const mockInsights: Insight[] = [
   {
     id: '1',
-    title: 'Understanding Liquidity Pools',
-    content: 'Liquidity pools are essential mechanisms in decentralized finance that enable automated trading without traditional order books.',
-    category: 'DeFi',
+    title: 'Circle IPO Surge',
+    content: 'Circle IPO is super hot, up 10x from the IPO price',
+    category: 'Market',
     timestamp: '2 hours ago',
-    tags: ['AMM', 'DEX'],
+    tags: ['Stablecoins', 'RWA', 'IPO'],
     hyperlinks: [
       {
-        text: 'Liquidity pools',
-        conceptId: 'liquidity-pools',
-        position: { start: 0, end: 15 },
+        text: 'Stablecoins',
+        conceptId: 'stablecoins',
+        position: { start: 52, end: 63 },
         type: 'complex'
       },
       {
-        text: 'decentralized finance',
-        conceptId: 'defi',
-        position: { start: 45, end: 65 },
-        type: 'complex'
+        text: 'RWA',
+        conceptId: 'rwa',
+        position: { start: 52, end: 55 },
+        type: 'simple'
       },
       {
-        text: 'automated trading',
-        conceptId: 'automated-trading',
-        position: { start: 80, end: 96 },
+        text: 'IPO',
+        conceptId: 'ipo',
+        position: { start: 41, end: 44 },
         type: 'simple'
       }
     ]
   },
   {
     id: '2',
-    title: 'Proof of Stake Consensus',
-    content: 'Proof of Stake offers an energy-efficient alternative to Proof of Work, where validators secure the network based on their stake.',
-    category: 'Blockchain',
+    title: 'Oya Protocol Launch',
+    content: 'The first version of the Oya protocol testnet was deployed in June 2024, and the public testnet is coming later this year.',
+    category: 'Technology',
     timestamp: '5 hours ago',
-    tags: ['Consensus', 'Staking'],
+    tags: ['Protocol', 'Testnet'],
     hyperlinks: [
       {
-        text: 'Proof of Stake',
-        conceptId: 'pos',
-        position: { start: 0, end: 14 },
-        type: 'complex'
-      },
-      {
-        text: 'Proof of Work',
-        conceptId: 'pow',
-        position: { start: 50, end: 63 },
-        type: 'complex'
-      },
-      {
-        text: 'validators',
-        conceptId: 'validators',
-        position: { start: 71, end: 81 },
+        text: 'testnet',
+        conceptId: 'testnet',
+        position: { start: 38, end: 45 },
         type: 'simple'
       }
     ]
   },
   {
     id: '3',
-    title: 'Smart Contract Standards',
-    content: 'ERC-721 and ERC-1155 standards define how non-fungible tokens function on Ethereum.',
-    category: 'NFT',
+    title: 'Dogecoin Market Cap',
+    content: 'At about $0.21 per coin, Dogecoin\'s $31 billion market cap in early 2025 was larger than many Fortune 500 companies despite having no supply cap.',
+    category: 'Market',
     timestamp: '1 day ago',
-    tags: ['Smart Contracts', 'Ethereum'],
+    tags: ['DOGE', 'Market Cap'],
     hyperlinks: [
       {
-        text: 'ERC-721',
-        conceptId: 'erc721',
-        position: { start: 0, end: 7 },
+        text: 'supply cap',
+        conceptId: 'supply-cap',
+        position: { start: 137, end: 147 },
         type: 'simple'
-      },
-      {
-        text: 'ERC-1155',
-        conceptId: 'erc1155',
-        position: { start: 12, end: 20 },
-        type: 'simple'
-      },
-      {
-        text: 'non-fungible tokens',
-        conceptId: 'nfts',
-        position: { start: 40, end: 59 },
-        type: 'complex'
       }
     ]
   },
   {
     id: '4',
-    title: 'Yield Farming Strategies',
-    content: 'Yield farming involves providing liquidity to earn rewards through various DeFi protocols.',
-    category: 'Trading',
+    title: 'Polygon Hardfork',
+    content: 'The Bhilai hardfork on 1 July 2025 raised Polygon\'s block gas limit from 30 million to 45 million, unlocking around 1,000 transactions per second capacity.',
+    category: 'Technology',
     timestamp: '3 hours ago',
-    tags: ['Yield', 'Rewards'],
+    tags: ['Hardfork', 'Gas Limit'],
     hyperlinks: [
       {
-        text: 'Yield farming',
-        conceptId: 'yield-farming',
-        position: { start: 0, end: 13 },
-        type: 'complex'
-      },
-      {
-        text: 'liquidity',
-        conceptId: 'liquidity',
-        position: { start: 33, end: 42 },
+        text: 'hardfork',
+        conceptId: 'hardfork',
+        position: { start: 11, end: 19 },
         type: 'simple'
       },
       {
-        text: 'DeFi protocols',
-        conceptId: 'protocols',
-        position: { start: 73, end: 87 },
-        type: 'complex'
+        text: 'gas limit',
+        conceptId: 'gas-limit',
+        position: { start: 59, end: 68 },
+        type: 'simple'
       }
     ]
   },

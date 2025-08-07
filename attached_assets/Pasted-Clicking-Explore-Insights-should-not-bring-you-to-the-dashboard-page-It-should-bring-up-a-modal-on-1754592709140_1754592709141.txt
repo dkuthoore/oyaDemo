@@ -1,0 +1,33 @@
+Clicking Explore Insights should not bring you to the /dashboard page 
+It should bring up a modal on the same page, with insight cards. 
+I have pasted in example content for the cards below:
+“Circle IPO is super hot, up 10x from the IPO price”
+ “Stablecoins” “RWA” “IPO”
+“The first version of the Oya protocol testnet was deployed in June 2024, and the public testnet is coming later this year.”
+Quick chat: What is a testnet? 
+“At about $0.21 per coin, Dogecoin’s $31 billion market cap in early 2025 was larger than many Fortune 500 companies despite having no supply cap.”
+Quick Chat: Supply Cap definition 
+Lesson: Tokenomics lesson, different variations of tokenomics, btc tokenomics, eth, burn, etc… 
+“The Bhilai hardfork on 1 July 2025 raised Polygon’s block gas limit from 30 million to 45 million, unlocking around 1,000 transactions per second capacity.”
+Quick Chat: What is a hardfork? 
+Quick Chat: What is a gas limit? 
+Update the nav menu in the header to only have 
+Survey (does nothing for now) 
+Insights (opens insights modal) 
+Lessons (goes to lessons page)
+The logo on the top left should be clickable and take you to the home/landing page 
+Change the title of the site from “CryptoLearn AI” to “OyaChat Demo”
+Remove all of the stuff below the “Explore Insights and Start Learning” buttons on the homepage 
+This is a prototype to demo, we do not need all of this content. I want to simplify and only have absolutely required components and content which will be demo’d in the 5-10 key user flows. 
+Here are the key user flows i want to demo: 
+User open the application, clicks on Insights in the top right corner 
+User sees insights in a modal, similar to OyaChat site, and can click arrows to move through insights 
+User can click on keywords, to open a chat window which automatically starts a chat by explaining the concept 
+Use can click on “lesson” button in the chat window to create a lesson  on the concept, if they want to go deeper
+User can go to the lessons page, to see a history of their lessons 
+User can go to an individual lesson’s page (or modal) to read the entire lesson and 
+User can take a quiz after the lesson to confirm their comprehension of the concept
+I think you created a backend server and a database
+Are these necessary? Lets not use them if we do not have to. 
+The only reason i think we may need a server is for the API calls, but if we can handle the API calls with tanstack query, lets do that instead? 
+Some of the modals have two “X” buttons, the shadCN modal comes with an X by default, remove the one you manually created 

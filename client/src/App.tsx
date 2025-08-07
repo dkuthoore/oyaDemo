@@ -9,13 +9,18 @@ import Lessons from "@/pages/Lessons";
 import Layout from "@/components/layout/Layout";
 import ChatModal from "@/components/chat/ChatModal";
 import InsightModal from "@/components/insights/InsightModal";
+import InsightsModal from "@/components/insights/InsightsModal";
 import LessonModal from "@/components/lessons/LessonModal";
 import FloatingChatButton from "@/components/chat/FloatingChatButton";
 
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={Landing} />
+      <Route path="/">
+        <Layout>
+          <Landing />
+        </Layout>
+      </Route>
       <Route path="/dashboard">
         <Layout>
           <Dashboard />
@@ -27,7 +32,9 @@ function Router() {
         </Layout>
       </Route>
       <Route>
-        <Landing />
+        <Layout>
+          <Landing />
+        </Layout>
       </Route>
     </Switch>
   );
@@ -42,6 +49,7 @@ function App() {
           <FloatingChatButton />
           <ChatModal />
           <InsightModal />
+          <InsightsModal />
           <LessonModal />
           <Toaster />
         </div>

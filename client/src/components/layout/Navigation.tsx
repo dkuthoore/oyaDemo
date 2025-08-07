@@ -1,14 +1,15 @@
 import { useLocation } from 'wouter';
-import { Brain, ChevronDown, BookOpen, User } from 'lucide-react';
+import { Brain, ChevronDown, BookOpen, ClipboardList, Lightbulb } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useAppStore } from '@/stores/appStore';
 
 export default function Navigation() {
   const [location, setLocation] = useLocation();
+  const { openInsightsModal } = useAppStore();
   
-  const navItems = [
-    { path: '/dashboard', icon: Brain, label: 'Insights' },
-    { path: '/lessons', icon: BookOpen, label: 'Lessons' },
-  ];
+  const handleInsightsClick = () => {
+    openInsightsModal();
+  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 p-6 flex justify-between items-center z-50 glassmorphism">
@@ -20,27 +21,41 @@ export default function Navigation() {
         <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
           <Brain className="text-white text-sm" size={16} />
         </div>
-        <span className="font-bold text-lg gradient-text">CryptoLearn AI</span>
-        <ChevronDown className="w-4 h-4" />
+        <span className="font-bold text-lg gradient-text">OyaChat Demo</span>
       </button>
       
       <div className="flex space-x-4">
-        {navItems.map(({ path, icon: Icon, label }) => (
-          <button
-            key={path}
-            onClick={() => setLocation(path)}
-            className={cn(
-              "w-10 h-10 rounded-full flex items-center justify-center transition-all",
-              location === path
-                ? "bg-gradient-primary text-white"
-                : "bg-white/10 text-icon-color hover:bg-white/20"
-            )}
-            title={label}
-            data-testid={`nav-${label.toLowerCase()}`}
-          >
-            <Icon className="w-5 h-5" />
-          </button>
-        ))}
+        <button
+          className="px-4 py-2 rounded-full bg-white/10 text-icon-color hover:bg-white/20 transition-all flex items-center space-x-2"
+          title="Survey"
+          data-testid="nav-survey"
+        >
+          <ClipboardList className="w-4 h-4" />
+          <span className="text-sm">Survey</span>
+        </button>
+        <button
+          onClick={handleInsightsClick}
+          className="px-4 py-2 rounded-full bg-white/10 text-icon-color hover:bg-white/20 transition-all flex items-center space-x-2"
+          title="Insights"
+          data-testid="nav-insights"
+        >
+          <Lightbulb className="w-4 h-4" />
+          <span className="text-sm">Insights</span>
+        </button>
+        <button
+          onClick={() => setLocation('/lessons')}
+          className={cn(
+            "px-4 py-2 rounded-full transition-all flex items-center space-x-2",
+            location === '/lessons'
+              ? "bg-gradient-primary text-white"
+              : "bg-white/10 text-icon-color hover:bg-white/20"
+          )}
+          title="Lessons"
+          data-testid="nav-lessons"
+        >
+          <BookOpen className="w-4 h-4" />
+          <span className="text-sm">Lessons</span>
+        </button>
       </div>
     </nav>
   );

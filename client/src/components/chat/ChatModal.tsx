@@ -2,15 +2,19 @@ import { useState, useEffect, useRef } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
-import { Send, X, Bot, User } from 'lucide-react';
+import { Send, X, Bot, User, BookOpen } from 'lucide-react';
 import { useAppStore } from '@/stores/appStore';
 import { useChat } from '@/hooks/useChat';
+import { useLocation } from 'wouter';
+import { useToast } from '@/hooks/use-toast';
 
 export default function ChatModal() {
   const [input, setInput] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
   const { isChatOpen, currentChatConcept, closeChat } = useAppStore();
   const { messages, isLoading, sendMessage, suggestedQuestions } = useChat();
+  const [, setLocation] = useLocation();
+  const { toast } = useToast();
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -27,6 +31,21 @@ export default function ChatModal() {
 
   const handleSuggestedQuestion = (question: string) => {
     sendMessage(question);
+  };
+
+  const handleCreateLesson = () => {
+    toast({
+      title: "Creating Lesson",
+      description: `Creating a comprehensive lesson about ${getConceptDisplayName(currentChatConcept)}...`,
+    });
+    closeChat();
+    setTimeout(() => {
+      setLocation('/lessons');
+      toast({
+        title: "Lesson Created",
+        description: "Your new lesson is ready in the Lessons section!",
+      });
+    }, 1500);
   };
 
   const getConceptDisplayName = (conceptId: string) => {
@@ -52,13 +71,15 @@ export default function ChatModal() {
               </p>
             </div>
           </div>
-          <button
-            onClick={closeChat}
-            className="text-text-secondary hover:text-white transition-colors"
-            data-testid="button-close-chat"
+          <Button
+            onClick={handleCreateLesson}
+            variant="outline"
+            className="flex items-center space-x-2 bg-white/10 hover:bg-white/20 border-white/20"
+            data-testid="button-create-lesson"
           >
-            <X className="w-6 h-6" />
-          </button>
+            <BookOpen className="w-4 h-4" />
+            <span>Create Lesson</span>
+          </Button>
         </div>
 
         {/* Messages */}

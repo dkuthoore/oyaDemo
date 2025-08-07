@@ -11,6 +11,8 @@ interface AppState {
   // Modal state
   isInsightModalOpen: boolean;
   currentInsight: Insight | null;
+  isInsightsModalOpen: boolean;
+  currentInsightIndex: number;
   isLessonModalOpen: boolean;
   currentLesson: Lesson | null;
   
@@ -22,6 +24,10 @@ interface AppState {
   
   openInsightModal: (insight: Insight) => void;
   closeInsightModal: () => void;
+  
+  openInsightsModal: () => void;
+  closeInsightsModal: () => void;
+  setCurrentInsightIndex: (index: number) => void;
   
   openLessonModal: (lesson: Lesson) => void;
   closeLessonModal: () => void;
@@ -36,6 +42,8 @@ export const useAppStore = create<AppState>()(
       isChatOpen: false,
       isInsightModalOpen: false,
       currentInsight: null,
+      isInsightsModalOpen: false,
+      currentInsightIndex: 0,
       isLessonModalOpen: false,
       currentLesson: null,
       
@@ -74,6 +82,23 @@ export const useAppStore = create<AppState>()(
           isInsightModalOpen: false,
           currentInsight: null
         });
+      },
+      
+      openInsightsModal: () => {
+        set({ 
+          isInsightsModalOpen: true,
+          currentInsightIndex: 0
+        });
+      },
+      
+      closeInsightsModal: () => {
+        set({ 
+          isInsightsModalOpen: false
+        });
+      },
+      
+      setCurrentInsightIndex: (index: number) => {
+        set({ currentInsightIndex: index });
       },
       
       openLessonModal: (lesson: Lesson) => {

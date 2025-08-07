@@ -3,28 +3,22 @@ import { Insight, Lesson, StatsData } from '@/types';
 export const mockInsights: Insight[] = [
   {
     id: '1',
-    title: 'Circle IPO Surge',
-    content: 'Circle IPO is super hot, up 10x from the IPO price',
+    title: 'Circle NYSE Debut',
+    content: 'Stablecoin giant Circle\'s shares surge in blowout NYSE debut',
     category: 'Market',
-    timestamp: '2 hours ago',
-    tags: ['Stablecoins', 'RWA', 'IPO'],
+    timestamp: '',
+    tags: ['Stablecoins', 'NYSE', 'IPO'],
     hyperlinks: [
       {
-        text: 'Stablecoins',
-        conceptId: 'stablecoins',
-        position: { start: 52, end: 63 },
+        text: 'Stablecoin',
+        conceptId: 'stablecoin',
+        position: { start: 0, end: 10 },
         type: 'complex'
       },
       {
-        text: 'RWA',
-        conceptId: 'rwa',
-        position: { start: 52, end: 55 },
-        type: 'simple'
-      },
-      {
-        text: 'IPO',
-        conceptId: 'ipo',
-        position: { start: 41, end: 44 },
+        text: 'Circle',
+        conceptId: 'circle',
+        position: { start: 17, end: 23 },
         type: 'simple'
       }
     ]
@@ -34,13 +28,19 @@ export const mockInsights: Insight[] = [
     title: 'Oya Protocol Launch',
     content: 'The first version of the Oya protocol testnet was deployed in June 2024, and the public testnet is coming later this year.',
     category: 'Technology',
-    timestamp: '5 hours ago',
+    timestamp: '',
     tags: ['Protocol', 'Testnet'],
     hyperlinks: [
       {
+        text: 'Oya protocol',
+        conceptId: 'oya-protocol',
+        position: { start: 27, end: 39 },
+        type: 'simple'
+      },
+      {
         text: 'testnet',
         conceptId: 'testnet',
-        position: { start: 38, end: 45 },
+        position: { start: 40, end: 47 },
         type: 'simple'
       }
     ]
@@ -50,9 +50,15 @@ export const mockInsights: Insight[] = [
     title: 'Dogecoin Market Cap',
     content: 'At about $0.21 per coin, Dogecoin\'s $31 billion market cap in early 2025 was larger than many Fortune 500 companies despite having no supply cap.',
     category: 'Market',
-    timestamp: '1 day ago',
+    timestamp: '',
     tags: ['DOGE', 'Market Cap'],
     hyperlinks: [
+      {
+        text: 'Dogecoin',
+        conceptId: 'dogecoin',
+        position: { start: 25, end: 33 },
+        type: 'simple'
+      },
       {
         text: 'supply cap',
         conceptId: 'supply-cap',
@@ -66,7 +72,7 @@ export const mockInsights: Insight[] = [
     title: 'Polygon Hardfork',
     content: 'The Bhilai hardfork on 1 July 2025 raised Polygon\'s block gas limit from 30 million to 45 million, unlocking around 1,000 transactions per second capacity.',
     category: 'Technology',
-    timestamp: '3 hours ago',
+    timestamp: '',
     tags: ['Hardfork', 'Gas Limit'],
     hyperlinks: [
       {

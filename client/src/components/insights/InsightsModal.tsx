@@ -55,7 +55,7 @@ export default function InsightsModal() {
             "inline-flex items-center underline decoration-dotted underline-offset-2 transition-colors",
             link.type === 'complex'
               ? "text-purple-400 hover:text-purple-300"
-              : "text-blue-400 hover:text-blue-300"
+              : "text-orange-400 hover:text-orange-300"
           )}
           data-testid={`concept-link-${link.conceptId}`}
         >
@@ -116,11 +116,10 @@ export default function InsightsModal() {
               >
                 {/* Header */}
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-start">
                     <Badge variant="secondary" className="bg-gradient-primary text-white">
                       {currentInsight.category}
                     </Badge>
-                    <span className="text-sm text-gray-400">{currentInsight.timestamp}</span>
                   </div>
                   
                   <h2 className="text-2xl font-bold text-white">

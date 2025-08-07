@@ -27,7 +27,7 @@ export default function Lessons() {
             animate={{ opacity: 1, y: 0 }}
             className="text-4xl font-bold gradient-text mb-4"
           >
-            Deep Learning Modules
+            Lessons
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -35,7 +35,7 @@ export default function Lessons() {
             transition={{ delay: 0.1 }}
             className="text-xl text-text-secondary"
           >
-            Comprehensive lessons tailored to your learning level
+            Comprehensive learning modules tailored to your interests and learning level
           </motion.p>
         </div>
         

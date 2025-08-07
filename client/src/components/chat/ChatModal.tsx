@@ -57,7 +57,10 @@ export default function ChatModal() {
 
   return (
     <Dialog open={isChatOpen} onOpenChange={closeChat}>
-      <DialogContent className="glassmorphism border-glassmorphism-border max-w-2xl max-h-[80vh] flex flex-col p-0">
+      <DialogContent 
+        className="glassmorphism border-glassmorphism-border max-w-md max-h-[70vh] flex flex-col p-0 fixed bottom-20 right-6 left-auto top-auto translate-x-0 translate-y-0"
+        onOpenAutoFocus={(e) => e.preventDefault()}
+      >
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-glassmorphism-border">
           <div className="flex items-center space-x-3">

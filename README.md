@@ -1,0 +1,44 @@
+Overview:
+This application is a prototype of an integration of two OyaChat AI features: 
+
+An AI Chatbot modal where the user can ask a cheap, fast AI model (gemini 2.5 flash) questions about crypto. The user can also click on keywords ("Concepts") in their Insights modal, to open an AI Chatbot window which teaches them more about the Concept in realtime, without completely leaving their Insights experience.
+An AI Lesson Creator, which can create a Lesson about a Concept. The user can click Create Lesson right from the AI Chatbot window, and instantly go from quick insights, to a deepdive on the topic with a quiz at the end. This feature is enabled by the Venice API, which is privacy preserving and web3-integrated, enabling free inference on a per-request basis.
+Core User Flows to Demo:
+Insights, Concepts, and ChatBot
+As a user, I want to click on the Insights button so that I can see personalized crypto Insights.
+As a user, I want to navigate through the insights so that I can explore different topics.
+As a user, I want to click on a keyword in an insight so that I can start a chat to learn more about that specific concept.
+As a user, I want to chat with the ChatBot about my own questions, independent of a Concept or Insight.
+
+Lessons
+As a user, I want to click the "lesson" button within a chat so that I can create a lesson on the current Concept.
+As a user, I want to view my saved lessons on the Lessons page so that I can review them at any time.
+As a user, I want to open an individual lesson so that I can read the full content.
+As a user, I want to take a quiz after completing a lesson so that I can test my understanding.
+Frontend/React Details:
+
+React 18, TypeScript, @tanstack/react-query, zustand, Tailwind + shadcn/ui, framer-motion, react-markdown.
+ShadCN components, they have an existing modal 
+Global State: 
+	zustand store controls chat open/close, current concept, messages, insights modal index, lesson modal state, and streaming flag.
+React Query 
+Data fetching (lists):
+useInsights and useLessons use @tanstack/react-query with queryKey and mock data, plus merge of localStorage for generated lessons.
+React Markdown library for formatting the results from the AI properly 
+Leveraged Gemini's Canvas mode to create a layout json file to closely mimic OyaChat existing theme and design 
+
+Backend/AI Details:
+
+Simple express backend for calling these APIs
+Chatbot: Gemini 2.5 Flash, streaming responses
+Lessons: Venice API, llama-3.3-70b
+
+Future Enhancements:
+Connect knowledge base of pre-generated, high quality responses for chats and lessons
+No need to regenerate text for the same topics many times
+Connect crypto price/data APIs, so the ChatBot can answer questions with real(time) data 
+Add webSearch functionality to the ChatBot, so it has up to date information
+Eg: it sometimes does not know what Oya Protocol is on its own. 
+Integration with Survey results, to personalize system prompts and customize responses and Lessons to adhere to the user's experience level
+Database connection to store chat history
+Better than using local storage in the browser, as well 

@@ -316,7 +316,9 @@ export default function LessonModal() {
                       <Award className="w-16 h-16 mx-auto mb-4 text-accent-success" />
                       <h3 className="text-2xl font-bold mb-2">Quiz Complete!</h3>
                       <p className="text-text-secondary mb-6">
-                        Great job completing this lesson. You've mastered the fundamentals!
+                        You got {generatedContent?.quiz?.filter((question: any, index: number) => 
+                          selectedAnswers[index] === question.answer
+                        ).length || 0}/{generatedContent?.quiz?.length || 0} questions correct! You may complete this lesson or try again.
                       </p>
                       
                       {/* Retry Button */}

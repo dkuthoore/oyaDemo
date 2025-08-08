@@ -28,8 +28,15 @@ export default function LessonModal() {
       const savedProgress = getLessonProgress(currentLesson.id);
       if (savedProgress) {
         setCurrentSectionIndex(savedProgress.currentSectionIndex);
-        // Convert array back to Set
-        setCompletedSections(new Set(savedProgress.completedSections || []));
+        // Handle different data formats for completedSections
+        let completedArray: number[] = [];
+        if (Array.isArray(savedProgress.completedSections)) {
+          completedArray = savedProgress.completedSections;
+        } else if (savedProgress.completedSections && typeof savedProgress.completedSections === 'object') {
+          // Handle case where it might be stored as an object or Set-like structure
+          completedArray = Object.keys(savedProgress.completedSections).map(Number).filter(n => !isNaN(n));
+        }
+        setCompletedSections(new Set(completedArray));
         setIsLessonCompleted(savedProgress.isCompleted);
         if (savedProgress.quizCompleted && savedProgress.isCompleted) {
           setShowQuiz(true);

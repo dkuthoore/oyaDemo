@@ -232,8 +232,13 @@ export const useAppStore = create<AppState>()(
           
           // Convert Set to array if needed
           const updatedProgress = { ...progress };
-          if (updatedProgress.completedSections && updatedProgress.completedSections instanceof Set) {
-            updatedProgress.completedSections = Array.from(updatedProgress.completedSections);
+          if (updatedProgress.completedSections) {
+            if (updatedProgress.completedSections instanceof Set) {
+              updatedProgress.completedSections = Array.from(updatedProgress.completedSections);
+            } else if (!Array.isArray(updatedProgress.completedSections)) {
+              // Ensure it's always an array
+              updatedProgress.completedSections = [];
+            }
           }
           
           return {

@@ -28,7 +28,8 @@ export default function LessonModal() {
       const savedProgress = getLessonProgress(currentLesson.id);
       if (savedProgress) {
         setCurrentSectionIndex(savedProgress.currentSectionIndex);
-        setCompletedSections(savedProgress.completedSections);
+        // Convert array back to Set
+        setCompletedSections(new Set(savedProgress.completedSections || []));
         setIsLessonCompleted(savedProgress.isCompleted);
         if (savedProgress.quizCompleted && savedProgress.isCompleted) {
           setShowQuiz(true);

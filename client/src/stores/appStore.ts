@@ -21,7 +21,7 @@ interface AppState {
   // Lesson progress state
   lessonProgress: Record<string, {
     currentSectionIndex: number;
-    completedSections: Set<number>;
+    completedSections: number[];
     quizCompleted: boolean;
     isCompleted: boolean;
   }>;
@@ -225,17 +225,23 @@ export const useAppStore = create<AppState>()(
         set((state) => {
           const existingProgress = state.lessonProgress[lessonId] || {
             currentSectionIndex: 0,
-            completedSections: new Set(),
+            completedSections: [],
             quizCompleted: false,
             isCompleted: false
           };
+          
+          // Convert Set to array if needed
+          const updatedProgress = { ...progress };
+          if (updatedProgress.completedSections && updatedProgress.completedSections instanceof Set) {
+            updatedProgress.completedSections = Array.from(updatedProgress.completedSections);
+          }
           
           return {
             lessonProgress: {
               ...state.lessonProgress,
               [lessonId]: {
                 ...existingProgress,
-                ...progress
+                ...updatedProgress
               }
             }
           };

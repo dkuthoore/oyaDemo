@@ -19,6 +19,7 @@ This application is a prototype of an integration of two OyaChat AI features:
 6. As a user, I want to view my saved lessons on the Lessons page so that I can review them at any time.  
 7. As a user, I want to open an individual lesson so that I can read the full content.  
 8. As a user, I want to take a quiz after completing a lesson so that I can test my understanding.
+9. As a user, I want to search and sort my Lessons. 
 
 ## Frontend/React Details:
 

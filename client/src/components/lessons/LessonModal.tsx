@@ -115,14 +115,16 @@ export default function LessonModal() {
         });
       }
     } else if (currentSectionIndex === totalSections - 1 && !showQuiz) {
-      // Mark the final section complete and show quiz if available
+      // Mark the final section complete
       markSectionComplete();
-      if (isGeneratedLesson && generatedContent?.quiz && generatedContent.quiz.length > 0) {
+      const newCompletedSections = new Set(completedSections).add(currentSectionIndex);
+      
+      // Only show quiz if ALL sections are completed AND quiz exists
+      if (newCompletedSections.size === totalSections && isGeneratedLesson && generatedContent?.quiz && generatedContent.quiz.length > 0) {
         setShowQuiz(true);
         
         // Save progress when showing quiz
         if (currentLesson) {
-          const newCompletedSections = new Set(completedSections).add(currentSectionIndex);
           updateLessonProgress(currentLesson.id, {
             currentSectionIndex,
             completedSections: newCompletedSections

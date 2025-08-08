@@ -142,7 +142,11 @@ export default function Lessons() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
-          className="grid md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-8 min-h-[600px]"
+          className="grid grid-cols-1 md:grid-cols-2 gap-8 min-h-[600px]"
+          style={{
+            gridTemplateRows: 'repeat(auto-fit, 400px)',
+            alignItems: 'start'
+          }}
         >
           {currentLessons.length > 0 ? (
             currentLessons.map((lesson, index) => (

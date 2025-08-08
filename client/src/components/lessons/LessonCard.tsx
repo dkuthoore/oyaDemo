@@ -69,7 +69,7 @@ export default function LessonCard({ lesson }: LessonCardProps) {
 
   return (
     <div
-      className="glassmorphism rounded-2xl p-8 hover:shadow-purple-glow transition-all duration-300 cursor-pointer group h-full min-h-[320px] flex flex-col"
+      className="glassmorphism rounded-2xl p-8 hover:shadow-purple-glow transition-all duration-300 cursor-pointer group h-[400px] max-h-[400px] flex flex-col"
       onClick={() => lesson.status !== 'Locked' && openLessonModal(lesson)}
       data-testid={`lesson-card-${lesson.id}`}
     >

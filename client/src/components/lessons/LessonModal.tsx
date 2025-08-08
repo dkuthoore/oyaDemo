@@ -81,18 +81,45 @@ export default function LessonModal() {
     if (index >= 0 && index < totalSections) {
       setCurrentSectionIndex(index);
       setShowQuiz(false);
+      
+      // Save progress when navigating to sections
+      if (currentLesson) {
+        updateLessonProgress(currentLesson.id, {
+          currentSectionIndex: index,
+          completedSections
+        });
+      }
     }
   };
 
   const handleNext = () => {
     if (currentSectionIndex < totalSections - 1) {
       markSectionComplete();
-      setCurrentSectionIndex(prev => prev + 1);
+      const newIndex = currentSectionIndex + 1;
+      setCurrentSectionIndex(newIndex);
+      
+      // Save progress when moving to next section
+      if (currentLesson) {
+        const newCompletedSections = new Set(completedSections).add(currentSectionIndex);
+        updateLessonProgress(currentLesson.id, {
+          currentSectionIndex: newIndex,
+          completedSections: newCompletedSections
+        });
+      }
     } else if (currentSectionIndex === totalSections - 1 && !showQuiz) {
       // Mark the final section complete and show quiz if available
       markSectionComplete();
       if (isGeneratedLesson && generatedContent?.quiz && generatedContent.quiz.length > 0) {
         setShowQuiz(true);
+        
+        // Save progress when showing quiz
+        if (currentLesson) {
+          const newCompletedSections = new Set(completedSections).add(currentSectionIndex);
+          updateLessonProgress(currentLesson.id, {
+            currentSectionIndex,
+            completedSections: newCompletedSections
+          });
+        }
       }
     }
   };
@@ -101,7 +128,16 @@ export default function LessonModal() {
     if (showQuiz) {
       setShowQuiz(false);
     } else if (currentSectionIndex > 0) {
-      setCurrentSectionIndex(prev => prev - 1);
+      const newIndex = currentSectionIndex - 1;
+      setCurrentSectionIndex(newIndex);
+      
+      // Save progress when moving to previous section
+      if (currentLesson) {
+        updateLessonProgress(currentLesson.id, {
+          currentSectionIndex: newIndex,
+          completedSections
+        });
+      }
     }
   };
 

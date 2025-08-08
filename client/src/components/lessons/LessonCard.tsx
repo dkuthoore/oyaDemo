@@ -120,16 +120,18 @@ export default function LessonCard({ lesson }: LessonCardProps) {
       </div>
       
         {/* Progress bar for in-progress lessons */}
-        {actualStatus === 'In Progress' && (
+        {actualStatus === 'In Progress' && progress && (
           <div className="mt-4">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs text-text-secondary">Progress</span>
-              <span className="text-xs text-yellow-400">{lesson.progress}%</span>
+              <span className="text-xs text-yellow-400">
+                {Math.round((progress.completedSections.size / (lesson.sections?.length || 1)) * 100)}%
+              </span>
             </div>
             <div className="w-full bg-white/10 rounded-full h-2">
               <div 
                 className="bg-gradient-secondary h-2 rounded-full transition-all duration-300" 
-                style={{ width: `${lesson.progress}%` }}
+                style={{ width: `${Math.round((progress.completedSections.size / (lesson.sections?.length || 1)) * 100)}%` }}
               />
             </div>
           </div>

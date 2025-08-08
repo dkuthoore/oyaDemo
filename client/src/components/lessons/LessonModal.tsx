@@ -1,4 +1,4 @@
-import { X, CheckCircle, Circle, ChevronLeft, ChevronRight, BookOpen, Award } from 'lucide-react';
+import { X, CheckCircle, Circle, ChevronLeft, ChevronRight, BookOpen, Award, RotateCcw } from 'lucide-react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -7,22 +7,43 @@ import { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 
 export default function LessonModal() {
-  const { isLessonModalOpen, currentLesson, closeLessonModal } = useAppStore();
+  const { 
+    isLessonModalOpen, 
+    currentLesson, 
+    closeLessonModal,
+    updateLessonProgress,
+    markLessonCompleted,
+    getLessonProgress
+  } = useAppStore();
   const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
   const [completedSections, setCompletedSections] = useState<Set<number>>(new Set());
   const [showQuiz, setShowQuiz] = useState(false);
   const [selectedAnswers, setSelectedAnswers] = useState<Record<number, string>>({});
   const [showQuizResults, setShowQuizResults] = useState(false);
+  const [isLessonCompleted, setIsLessonCompleted] = useState(false);
 
   useEffect(() => {
-    if (isLessonModalOpen) {
-      setCurrentSectionIndex(0);
-      setCompletedSections(new Set());
-      setShowQuiz(false);
-      setSelectedAnswers({});
-      setShowQuizResults(false);
+    if (isLessonModalOpen && currentLesson) {
+      // Load saved progress or start fresh
+      const savedProgress = getLessonProgress(currentLesson.id);
+      if (savedProgress) {
+        setCurrentSectionIndex(savedProgress.currentSectionIndex);
+        setCompletedSections(savedProgress.completedSections);
+        setIsLessonCompleted(savedProgress.isCompleted);
+        if (savedProgress.quizCompleted && savedProgress.isCompleted) {
+          setShowQuiz(true);
+          setShowQuizResults(true);
+        }
+      } else {
+        setCurrentSectionIndex(0);
+        setCompletedSections(new Set());
+        setShowQuiz(false);
+        setSelectedAnswers({});
+        setShowQuizResults(false);
+        setIsLessonCompleted(false);
+      }
     }
-  }, [isLessonModalOpen]);
+  }, [isLessonModalOpen, currentLesson, getLessonProgress]);
 
   // Early return after all hooks are declared
   if (!currentLesson) return null;
@@ -44,7 +65,16 @@ export default function LessonModal() {
   const allSectionsCompleted = completedSections.size === totalSections;
 
   const markSectionComplete = () => {
-    setCompletedSections(prev => new Set(prev).add(currentSectionIndex));
+    const newCompletedSections = new Set(completedSections).add(currentSectionIndex);
+    setCompletedSections(newCompletedSections);
+    
+    // Save progress to store
+    if (currentLesson) {
+      updateLessonProgress(currentLesson.id, {
+        currentSectionIndex,
+        completedSections: newCompletedSections
+      });
+    }
   };
 
   const navigateToSection = (index: number) => {
@@ -77,6 +107,20 @@ export default function LessonModal() {
 
   const handleQuizSubmit = () => {
     setShowQuizResults(true);
+    // Mark lesson as completed
+    if (currentLesson) {
+      markLessonCompleted(currentLesson.id);
+      setIsLessonCompleted(true);
+    }
+  };
+
+  const handleRetryQuiz = () => {
+    setSelectedAnswers({});
+    setShowQuizResults(false);
+  };
+
+  const handleFinishLesson = () => {
+    closeLessonModal();
   };
 
   return (
@@ -86,13 +130,6 @@ export default function LessonModal() {
         <div className="w-80 border-r border-glassmorphism-border p-6 overflow-y-auto">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-semibold">Course Content</h3>
-            <button
-              onClick={closeLessonModal}
-              className="text-text-secondary hover:text-white transition-colors"
-              data-testid="button-close-lesson-modal"
-            >
-              <X className="w-5 h-5" />
-            </button>
           </div>
           
           <div className="space-y-2">
@@ -189,21 +226,32 @@ export default function LessonModal() {
                   <ChevronLeft className="w-4 h-4" />
                   <span>Previous</span>
                 </Button>
-                <Button
-                  onClick={handleNext}
-                  disabled={showQuiz && !allSectionsCompleted}
-                  className="flex items-center space-x-2"
-                  data-testid="button-next-section"
-                >
-                  <span>
-                    {showQuiz 
-                      ? 'Finish' 
-                      : currentSectionIndex === totalSections - 1 
-                        ? 'Complete & Quiz' 
-                        : 'Next'}
-                  </span>
-                  <ChevronRight className="w-4 h-4" />
-                </Button>
+                {showQuizResults && isLessonCompleted ? (
+                  <Button
+                    onClick={handleFinishLesson}
+                    className="flex items-center space-x-2"
+                    data-testid="button-finish-lesson"
+                  >
+                    <span>Finish</span>
+                    <CheckCircle className="w-4 h-4" />
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={handleNext}
+                    disabled={showQuiz && !allSectionsCompleted}
+                    className="flex items-center space-x-2"
+                    data-testid="button-next-section"
+                  >
+                    <span>
+                      {showQuiz 
+                        ? 'Finish' 
+                        : currentSectionIndex === totalSections - 1 
+                          ? 'Complete & Quiz' 
+                          : 'Next'}
+                    </span>
+                    <ChevronRight className="w-4 h-4" />
+                  </Button>
+                )}
               </div>
             </div>
           </div>
@@ -263,28 +311,89 @@ export default function LessonModal() {
                     </div>
                   </>
                 ) : (
-                  <div className="text-center space-y-6">
-                    <div className="glassmorphism rounded-lg p-8">
+                  <div className="space-y-6">
+                    <div className="glassmorphism rounded-lg p-8 text-center">
                       <Award className="w-16 h-16 mx-auto mb-4 text-accent-success" />
                       <h3 className="text-2xl font-bold mb-2">Quiz Complete!</h3>
                       <p className="text-text-secondary mb-6">
                         Great job completing this lesson. You've mastered the fundamentals!
                       </p>
-                      <div className="space-y-2">
-                        {generatedContent?.quiz?.map((question: any, questionIndex: number) => {
-                          const isCorrect = selectedAnswers[questionIndex] === question.answer;
-                          return (
-                            <div
-                              key={questionIndex}
-                              className={`p-3 rounded-lg text-sm ${
-                                isCorrect ? 'bg-accent-success/20 text-accent-success' : 'bg-red-500/20 text-red-400'
-                              }`}
-                            >
-                              Question {questionIndex + 1}: {isCorrect ? 'Correct' : 'Incorrect'}
-                            </div>
-                          );
-                        })}
+                      
+                      {/* Retry Button */}
+                      <div className="flex justify-center gap-4 mb-6">
+                        <Button
+                          onClick={handleRetryQuiz}
+                          variant="outline"
+                          className="flex items-center gap-2"
+                          data-testid="button-retry-quiz"
+                        >
+                          <RotateCcw className="w-4 h-4" />
+                          Try Again
+                        </Button>
                       </div>
+                    </div>
+
+                    {/* Quiz Results with Correct/Incorrect Highlighting */}
+                    <div className="space-y-4">
+                      <h4 className="text-lg font-semibold mb-4">Quiz Results</h4>
+                      {generatedContent?.quiz?.map((question: any, questionIndex: number) => {
+                        const userAnswer = selectedAnswers[questionIndex];
+                        const correctAnswer = question.answer;
+                        const isCorrect = userAnswer === correctAnswer;
+                        
+                        return (
+                          <div key={questionIndex} className="glassmorphism rounded-lg p-6">
+                            <h5 className="font-medium mb-4">
+                              Question {questionIndex + 1}: {question.question}
+                            </h5>
+                            
+                            <div className="space-y-2">
+                              {question.options.map((option: string, optionIndex: number) => {
+                                let optionClass = "p-3 rounded-lg border transition-colors";
+                                
+                                if (option === correctAnswer) {
+                                  // Correct answer - always green
+                                  optionClass += " bg-green-500/20 border-green-500/40 text-green-400";
+                                } else if (option === userAnswer && !isCorrect) {
+                                  // User's incorrect answer - red
+                                  optionClass += " bg-red-500/20 border-red-500/40 text-red-400";
+                                } else {
+                                  // Other options - neutral
+                                  optionClass += " bg-white/5 border-white/10 text-text-secondary";
+                                }
+                                
+                                return (
+                                  <div key={optionIndex} className={optionClass}>
+                                    <div className="flex items-center justify-between">
+                                      <span className="text-sm">{option}</span>
+                                      <div className="flex items-center gap-2">
+                                        {option === correctAnswer && (
+                                          <span className="text-green-400 text-xs font-medium">Correct</span>
+                                        )}
+                                        {option === userAnswer && !isCorrect && (
+                                          <span className="text-red-400 text-xs font-medium">Your answer</span>
+                                        )}
+                                      </div>
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                            
+                            {/* Question Summary */}
+                            <div className={`mt-3 p-2 rounded text-sm ${
+                              isCorrect 
+                                ? 'bg-green-500/10 text-green-400' 
+                                : 'bg-red-500/10 text-red-400'
+                            }`}>
+                              {isCorrect 
+                                ? '✓ You got this question correct!' 
+                                : `✗ You answered: "${userAnswer}" | Correct answer: "${correctAnswer}"`
+                              }
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 )}

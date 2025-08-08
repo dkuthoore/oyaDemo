@@ -7,7 +7,13 @@ interface LessonCardProps {
 }
 
 export default function LessonCard({ lesson }: LessonCardProps) {
-  const { openLessonModal } = useAppStore();
+  const { openLessonModal, getLessonProgress } = useAppStore();
+  
+  // Get lesson progress to determine actual status
+  const progress = getLessonProgress(lesson.id);
+  const actualStatus = progress?.isCompleted ? 'Completed' : 
+                      (progress?.currentSectionIndex && progress.currentSectionIndex > 0) ? 'In Progress' : 
+                      lesson.status;
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -81,9 +87,9 @@ export default function LessonCard({ lesson }: LessonCardProps) {
             </p>
           </div>
         </div>
-        <div className={`px-3 py-1 ${getStatusColor(lesson.status)} rounded-full text-xs font-medium flex items-center space-x-1`}>
-          {getStatusIcon(lesson.status)}
-          <span>{lesson.status}</span>
+        <div className={`px-3 py-1 ${getStatusColor(actualStatus)} rounded-full text-xs font-medium flex items-center space-x-1`}>
+          {getStatusIcon(actualStatus)}
+          <span>{actualStatus}</span>
         </div>
       </div>
       
@@ -105,16 +111,16 @@ export default function LessonCard({ lesson }: LessonCardProps) {
               </span>
             ))}
           </div>
-          <div className={lesson.status === 'Completed' ? 'text-accent-success' : 
-                          lesson.status === 'In Progress' ? 'text-yellow-400' : 
-                          lesson.status === 'Locked' ? 'text-text-secondary' : 'text-accent-card-red'}>
-            {getStatusIcon(lesson.status)}
+          <div className={actualStatus === 'Completed' ? 'text-accent-success' : 
+                          actualStatus === 'In Progress' ? 'text-yellow-400' : 
+                          actualStatus === 'Locked' ? 'text-text-secondary' : 'text-accent-card-red'}>
+            {getStatusIcon(actualStatus)}
           </div>
         </div>
       </div>
       
         {/* Progress bar for in-progress lessons */}
-        {lesson.status === 'In Progress' && (
+        {actualStatus === 'In Progress' && (
           <div className="mt-4">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs text-text-secondary">Progress</span>

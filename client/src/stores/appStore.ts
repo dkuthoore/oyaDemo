@@ -18,6 +18,14 @@ interface AppState {
   isLessonModalOpen: boolean;
   currentLesson: Lesson | null;
   
+  // Lesson progress state
+  lessonProgress: Record<string, {
+    currentSectionIndex: number;
+    completedSections: Set<number>;
+    quizCompleted: boolean;
+    isCompleted: boolean;
+  }>;
+  
   // Actions
   openChat: (conceptId?: string) => void;
   openChatWithConcept: (conceptId: string) => void;
@@ -36,6 +44,11 @@ interface AppState {
   openLessonModal: (lesson: Lesson) => void;
   closeLessonModal: () => void;
   closeAllModals: () => void;
+  
+  // Lesson progress actions
+  updateLessonProgress: (lessonId: string, progress: Partial<AppState['lessonProgress']['']>) => void;
+  markLessonCompleted: (lessonId: string) => void;
+  getLessonProgress: (lessonId: string) => AppState['lessonProgress'][''] | null;
 }
 
 export const useAppStore = create<AppState>()(
@@ -52,6 +65,7 @@ export const useAppStore = create<AppState>()(
       currentInsightIndex: 0,
       isLessonModalOpen: false,
       currentLesson: null,
+      lessonProgress: {},
       
       // Actions
       openChat: (conceptId?: string) => {
@@ -206,12 +220,52 @@ export const useAppStore = create<AppState>()(
           currentLesson: null
         });
       },
+      
+      updateLessonProgress: (lessonId: string, progress: Partial<AppState['lessonProgress']['']>) => {
+        set((state) => {
+          const existingProgress = state.lessonProgress[lessonId] || {
+            currentSectionIndex: 0,
+            completedSections: new Set(),
+            quizCompleted: false,
+            isCompleted: false
+          };
+          
+          return {
+            lessonProgress: {
+              ...state.lessonProgress,
+              [lessonId]: {
+                ...existingProgress,
+                ...progress
+              }
+            }
+          };
+        });
+      },
+      
+      markLessonCompleted: (lessonId: string) => {
+        set((state) => ({
+          lessonProgress: {
+            ...state.lessonProgress,
+            [lessonId]: {
+              ...state.lessonProgress[lessonId],
+              isCompleted: true,
+              quizCompleted: true
+            }
+          }
+        }));
+      },
+      
+      getLessonProgress: (lessonId: string) => {
+        const state = get();
+        return state.lessonProgress[lessonId] || null;
+      },
     }),
     {
       name: 'cryptolearn-storage',
       partialize: (state) => ({
-        // Only persist chat messages
+        // Persist chat messages and lesson progress
         chatMessages: state.chatMessages,
+        lessonProgress: state.lessonProgress,
       }),
     }
   )

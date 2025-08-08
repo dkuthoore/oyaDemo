@@ -2,6 +2,7 @@ import { useLocation } from 'wouter';
 import { Brain, ChevronDown, BookOpen, ClipboardList, Lightbulb } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAppStore } from '@/stores/appStore';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 export default function Navigation() {
   const [location, setLocation] = useLocation();
@@ -25,14 +26,20 @@ export default function Navigation() {
       </button>
       
       <div className="flex space-x-4">
-        <button
-          className="px-4 py-2 rounded-full bg-white/10 text-icon-color hover:bg-white/20 transition-all flex items-center space-x-2"
-          title="Survey"
-          data-testid="nav-survey"
-        >
-          <ClipboardList className="w-4 h-4" />
-          <span className="text-sm">Survey</span>
-        </button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              className="px-4 py-2 rounded-full bg-white/10 text-icon-color hover:bg-white/20 transition-all flex items-center space-x-2"
+              data-testid="nav-survey"
+            >
+              <ClipboardList className="w-4 h-4" />
+              <span className="text-sm">Survey</span>
+            </button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Functionality disabled for this demo.</p>
+          </TooltipContent>
+        </Tooltip>
         <button
           onClick={handleInsightsClick}
           className="px-4 py-2 rounded-full bg-white/10 text-icon-color hover:bg-white/20 transition-all flex items-center space-x-2"

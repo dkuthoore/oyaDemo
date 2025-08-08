@@ -379,18 +379,6 @@ export default function LessonModal() {
                                 );
                               })}
                             </div>
-                            
-                            {/* Question Summary */}
-                            <div className={`mt-3 p-2 rounded text-sm ${
-                              isCorrect 
-                                ? 'bg-green-500/10 text-green-400' 
-                                : 'bg-red-500/10 text-red-400'
-                            }`}>
-                              {isCorrect 
-                                ? '✓ You got this question correct!' 
-                                : `✗ You answered: "${userAnswer}" | Correct answer: "${correctAnswer}"`
-                              }
-                            </div>
                           </div>
                         );
                       })}

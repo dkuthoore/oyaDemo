@@ -154,7 +154,7 @@ export default function ChatModal() {
     if (currentChatConcept === 'general' || !currentChatConcept) {
       toast({
         title: "No Topic Selected",
-        description: "Please select a specific topic to create a lesson.",
+        description: "Currently, we only generate lessons for core web3 Concepts displayed in our Insights. General Lessons coming soon!",
         variant: "destructive",
       });
       return;
